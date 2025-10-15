@@ -19,7 +19,7 @@ private IMU imu;
     @Override
     public void init() {
         limlight = hardwareMap.get(Limelight3A.class,"limelight");
-        limlight.pipelineSwitch(4); //april tag#24 pipeline
+        limlight.pipelineSwitch(5); //april tag#24/20 pipeline
         imu = hardwareMap.get(IMU.class,"imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
