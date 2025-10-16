@@ -11,9 +11,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class MekanumDrive {
-    private DcMotor frontLeftMotor, frontRightMotor,backLeftMotor,backRightMotor;//define motors
+    public DcMotor frontLeftMotor, frontRightMotor,backLeftMotor,backRightMotor;//define motors
     private IMU imu;
-    private Limelight3A limelight3A;
     //init function
     public void  init(HardwareMap HwMap,Limelight3A _limelight3A){//this one uses the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
         // import motors form the configureation
@@ -50,7 +49,6 @@ public class MekanumDrive {
         //reset the yaw daniel
         imu.resetYaw();
         //limelight3A stuff
-        limelight3A = _limelight3A;
     }
     //init function
     public void  init(HardwareMap HwMap){//this dose not use the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
@@ -125,10 +123,6 @@ public class MekanumDrive {
         double newStrafe = r * Math.cos(theta);
 
         this.drive(newForward, newStrafe, rotate);
-    }
-    public double allignWithTag(int limeLightChanel){
-        double offset = 0;
-        return offset;
     }
 
 }
