@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MekanumDrive;
 
 public class AutoMovements extends MekanumDrive {
     private Limelight3A limelight;
-    private LLResult llResult;
+    public LLResult llResult;
     public void initAuto(HardwareMap HwMap, Limelight3A _limelight){
         this.init(HwMap);//init the drive
 
@@ -25,7 +25,7 @@ public class AutoMovements extends MekanumDrive {
         this.backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     }
-    private double getTagDist(){
+    public double getTagDist(){
         llResult = null;
         llResult = limelight.getLatestResult();
         if (llResult != null & llResult.isValid()) {
@@ -38,15 +38,24 @@ public class AutoMovements extends MekanumDrive {
             return -1;
         }
     }
+    public double getTagAngle(){
+        llResult = null;
+        llResult = limelight.getLatestResult();
+        if (llResult != null & llResult.isValid()) {
+
+            double x = llResult.getTx();
+            return x;
+        }else{
+            return -1;
+        }
+    }
     public void moveTagRealative(double distance,double MoE,double maxSpeed,boolean dirCorr){
         double dist = this.getTagDist();
-        while(dist > (distance + MoE)){//while it is not close eneough MoE = margin of error
+        while(dist > distance){//while it is not close eneough MoE = margin of error
             dist = this.getTagDist();
-            if(llResult != null & llResult.isValid() & dirCorr){//direction correcting
-                this.drive(max(min(maxSpeed,(dist - distance)),maxSpeed * -1)/*decelerate the last 4 inches constraining between maximum speed*/,0/*no strafeing*/, (llResult.getTx() / 10) * -1/*direction correction */);
-            }else{
-                this.drive(max(min(maxSpeed,(dist - distance)),maxSpeed * -1)/*decelerate the last 4 inches constraining between maximum speed*/,0/*no strafeing*/, 0/*no direction correction*/);
-            }//drive closer to the target
+            if(llResult != null & llResult.isValid()){//direction correcting
+                this.drive(max(min(maxSpeed,(dist - distance)),maxSpeed * -1)/*decelerate the last 4 inches constraining between maximum speed*/,0/*no strafeing*/, 0/*IMPLEMENT direction correction */);
+            }//TODO implement direction correction
 
         }
         this.backLeftMotor.setPower(0);
@@ -54,4 +63,5 @@ public class AutoMovements extends MekanumDrive {
         this.frontLeftMotor.setPower(0);
         this.frontRightMotor.setPower(0);
     }
+
 }
