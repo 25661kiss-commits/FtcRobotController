@@ -9,14 +9,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.autonomous.PrintODO;
 
 public class MekanumDrive {
     public DcMotor frontLeftMotor, frontRightMotor,backLeftMotor,backRightMotor;//define motors
     private IMU imu;
+    private PrintODO PRINTOUT;
     //init function
-    public void  init(HardwareMap HwMap,Limelight3A _limelight3A){//this one uses the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
+    public void  init(HardwareMap HwMap, PrintODO _PRINTOUT){//this one uses the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
         // import motors form the configureation
-
+        PRINTOUT = _PRINTOUT;
         frontLeftMotor = HwMap.get(DcMotor.class, "front_left_motor");
         frontRightMotor = HwMap.get(DcMotor.class, "front_right_motor");
         backLeftMotor = HwMap.get(DcMotor.class, "back_left_motor");
@@ -66,10 +68,10 @@ public class MekanumDrive {
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // set runmode run using encoder
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // imu initalization
         // using rev control hub internal imu
@@ -93,6 +95,9 @@ public class MekanumDrive {
         return imu;//daniel
     }
     public void drive(double forward, double strafe, double rotate){
+        if(PRINTOUT != null){
+            PRINTOUT.PRINTOUT();
+        }
         double frontLeftPower = forward + strafe + rotate;
         double backLeftPower = forward - strafe + rotate;
         double frontRightPower = forward - strafe - rotate;

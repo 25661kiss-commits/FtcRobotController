@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @TeleOp
 public class LimeLightTest extends OpMode {
-
+    private double TPMM = 68.440839782642795137756153472092;//ticks per inch
     private Limelight3A limelight3A;
     gobuildaPinpoint pinpoint = new gobuildaPinpoint();
     GoBildaPinpointDriver odo;
@@ -28,6 +28,9 @@ public class LimeLightTest extends OpMode {
         limelight3A.pipelineSwitch(5);//1 is green
         pinpoint.init(hardwareMap);
         odo = pinpoint.getPinpoint();
+        odo.setEncoderResolution(TPMM,DistanceUnit.MM);
+        odo.setOffsets(-3.5,-4.5,DistanceUnit.INCH);
+        odo.resetPosAndIMU();
     }
     @Override
     public void start() {
@@ -47,8 +50,8 @@ public class LimeLightTest extends OpMode {
         telemetry.addData("distance:",targetDist);
     }
     odo.update();
-    telemetry.addData("pinpointX",odo.getPosX(DistanceUnit.CM));
-    telemetry.addData("pinpointY",odo.getPosY(DistanceUnit.CM));
+    telemetry.addData("pinpointX",odo.getPosX(DistanceUnit.INCH));
+    telemetry.addData("pinpointY",odo.getPosY(DistanceUnit.INCH));
     telemetry.addData("pinpointZ",odo.getHeading(AngleUnit.DEGREES));
 
 
