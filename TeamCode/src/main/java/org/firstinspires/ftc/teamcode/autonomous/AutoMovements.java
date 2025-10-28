@@ -14,9 +14,8 @@ import org.firstinspires.ftc.teamcode.mechaisms.MekanumDrive;
 public class AutoMovements extends MekanumDrive {
     private Limelight3A limelight;
     public LLResult llResult;
-    public void initAuto(HardwareMap HwMap, Limelight3A _limelight){
-        this.init(HwMap);//init the drive
-
+    public void initAuto(HardwareMap HwMap, PrintODO PRINTOUT,Limelight3A _limelight){
+        this.init(HwMap, PRINTOUT);//init the drive
         limelight = _limelight;
         limelight.pipelineSwitch(5);//1 is green
         this.frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
