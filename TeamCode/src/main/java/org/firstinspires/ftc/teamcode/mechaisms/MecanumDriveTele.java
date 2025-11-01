@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.mechaisms;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -11,47 +10,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.autonomous.PrintODO;
 
-public class MekanumDrive {
+public class MecanumDriveTele {
     public DcMotor frontLeftMotor, frontRightMotor,backLeftMotor,backRightMotor;//define motors
     private IMU imu;
-    private PrintODO PRINTOUT;
-    //init function
-    public void  init(HardwareMap HwMap, PrintODO _PRINTOUT){//this one uses the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
-        // import motors form the configureation
-        PRINTOUT = _PRINTOUT;
-        frontLeftMotor = HwMap.get(DcMotor.class, "front_left_motor");
-        frontRightMotor = HwMap.get(DcMotor.class, "front_right_motor");
-        backLeftMotor = HwMap.get(DcMotor.class, "back_left_motor");
-        backRightMotor = HwMap.get(DcMotor.class, "back_right_motor");
-
-        //set motor diretion
-        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // set runmode run using encoder
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // imu initalization
-        // using rev control hub internal imu
-
-        imu = HwMap.get(IMU.class, "imu");
-        // imu diretion
-        RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
-
-        //initalize imu
-        imu.initialize(new IMU.Parameters(RevOrientation));
-
-        //reset the yaw daniel
-        imu.resetYaw();
-        //limelight3A stuff
-    }
     //init function
     public void  init(HardwareMap HwMap){//this dose not use the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
         // import motors form the configureation
@@ -68,10 +29,47 @@ public class MekanumDrive {
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // set runmode run using encoder
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightMotor.setMode(RunMode.RUN_USING_ENCODER);
+        frontLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
+        backRightMotor.setMode(RunMode.RUN_USING_ENCODER);
+        backLeftMotor.setMode(RunMode.RUN_USING_ENCODER);
+
+        // imu initalization
+        // using rev control hub internal imu
+
+        imu = HwMap.get(IMU.class, "imu");
+        // imu diretion
+        RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
+
+        //initalize imu
+        imu.initialize(new IMU.Parameters(RevOrientation));
+
+        //reset the yaw daniel
+        imu.resetYaw();
+        //limelight3A stuff
+
+    }
+    public void  init(HardwareMap HwMap, RunMode encoderMode){//this dose not use the limeight means that the default value value is null so it wont error if  no limelight3A objet is provided later we wil use a if(!(limelight3A == null)){statements if limelight3A exists} to detect if a limelight3A object is passed
+        // import motors form the configureation
+
+        frontLeftMotor = HwMap.get(DcMotor.class, "front_left_motor");
+        frontRightMotor = HwMap.get(DcMotor.class, "front_right_motor");
+        backLeftMotor = HwMap.get(DcMotor.class, "back_left_motor");
+        backRightMotor = HwMap.get(DcMotor.class, "back_right_motor");
+
+        //set motor diretion
+        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // set runmode run using encoder
+        frontRightMotor.setMode(encoderMode);
+        frontLeftMotor.setMode(encoderMode);
+        backRightMotor.setMode(encoderMode);
+        backLeftMotor.setMode(encoderMode);
 
         // imu initalization
         // using rev control hub internal imu
@@ -104,7 +102,7 @@ public class MekanumDrive {
         double backRightPower = forward + strafe - rotate;
 
         double maxPower = 1.0;
-        double maxSpeed = 0.5;
+        double maxSpeed = 0.7;
 
         maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
         maxPower = Math.max(maxPower, Math.abs(frontRightPower));
