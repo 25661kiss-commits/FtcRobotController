@@ -8,7 +8,9 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
@@ -18,16 +20,30 @@ public class MecanumDriveColinOrientated extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
-    private final double targetSpeedHigh = 1;
+    private final double targetSpeedHigh = 0.7;
     private final double targetSpeedMed = 0.4;
     private final double targetSpeedLow = 0.2;
+    private DcMotorEx shooterMotor;
+    private DcMotor rtIntake;
+    private DcMotor ltIntake;
+    private CRServo rtFire;
+    private CRServo ltFire;
+    private double shooterPower = 0.5;
     private IMU imu;//my stuff daniel
     private boolean fire = false;
+    private double idleSpeed = 0;
+    private double setSpeed = 0;
+    private double speedGoal = 0;
 
     @Override
     public void init(){
-        drive.init(hardwareMap, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
         imu = drive.getImu();
+        ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
+        rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
+        shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
+        rtFire = hardwareMap.get(CRServo.class,"right_fire_servo");
+        ltFire = hardwareMap.get(CRServo.class,"left_fire_servo");
         limelight3A = hardwareMap.get(Limelight3A.class,"limelight");
         limelight3A.pipelineSwitch(5);//1 is green
 
@@ -41,280 +57,108 @@ public class MecanumDriveColinOrientated extends OpMode {
     @Override
     public void loop(){
         //movement
+        ltIntake.setPower(-gamepad2.left_stick_y);
+        rtIntake.setPower(-gamepad2.right_stick_y);
+        ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
+        rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         forward = gamepad1.left_stick_y;
         strafe = -gamepad1.left_stick_x;
-        rotate = gamepad1.right_stick_x;
-        drive.drive(forward,strafe,rotate);
+        rotate = -gamepad1.right_stick_x;
+
         if(gamepad1.a) {
             double speed = getLLRotationOffset();
         }
         //line up with target
-        if(gamepad1.left_bumper | gamepad1.right_bumper) {
-            fire = true;
-            //turn left to limelight tag...
-            double rotation = getLLRotationOffset();
-            double targetSpeed;
-            if (rotation > 0 & rotation != -1) {
-                //positive stuff
-                while (rotation == -1 || rotation > 1) {
-
-                    rotation = getLLRotationOffset();
-                    if (rotation == -1) {
-                        drive.drive(0, 0, -targetSpeedHigh);
-                    } else {
-                        if(abs(rotation) < 10){
-                            targetSpeed = targetSpeedLow;
-                        }else{
-                            targetSpeed = targetSpeedMed;
-                        }
-                        drive.drive(0, 0, -targetSpeed);
-                    }
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-                //drive.drive(0, 0, 0);
-                while (rotation < 0) {
-
-                    rotation = getLLRotationOffset();
-                    drive.drive(0, 0, 0.2);
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-            } else if (rotation < 0 & rotation != -1) {
-                //negative stuff
-                while (rotation == -1 || rotation < -1) {
-
-                    rotation = getLLRotationOffset();
-                    if (rotation == -1) {
-                        drive.drive(0, 0, targetSpeedHigh);
-                    } else {
-                        if(abs(rotation) < 10){
-                            targetSpeed = targetSpeedLow;
-                        }else{
-                            targetSpeed = targetSpeedMed;
-                        }
-                        drive.drive(0, 0, targetSpeed);
-                    }
-
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-                //drive.drive(0, 0, 0);
-                while (rotation > 0) {
-
-                    rotation = getLLRotationOffset();
-                    drive.drive(0, 0, -0.2);
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-            } else if (rotation == -1) {
-                //invalid stuff
-                if (gamepad1.left_bumper) {
-                    while (rotation == -1 || rotation < -1) {
-
-                        rotation = getLLRotationOffset();
-                        if (rotation == -1) {
-                            drive.drive(0, 0, targetSpeedHigh);
-                        } else {
-                            if(abs(rotation) < 10){
-                                targetSpeed = targetSpeedLow;
-                            }else{
-                                targetSpeed = targetSpeedMed;
-                            }
-                            drive.drive(0, 0, targetSpeed);
-                        }
-
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                    //drive.drive(0, 0, 0);
-                    while (rotation > 0) {
-
-                        rotation = getLLRotationOffset();
-                        drive.drive(0, 0, -0.2);
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                } else if(gamepad1.right_bumper){
-
-                    while (rotation == -1 || rotation > 1) {
-
-                        rotation = getLLRotationOffset();
-                        if (rotation == -1) {
-                            drive.drive(0, 0, -0.6);
-                        } else {
-                            if(abs(rotation) < 10){
-                                targetSpeed = targetSpeedLow;
-                            }else{
-                                targetSpeed = targetSpeedMed;
-                            }
-                            drive.drive(0, 0, -targetSpeed);
-
-                        }
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                    //drive.drive(0, 0, 0);
-                    while (rotation < 0) {
-
-                        rotation = getLLRotationOffset();
-                        drive.drive(0, 0, 0.2);
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                }
-            } else {
-                //handle exception this really shoulden't happen
+        if(gamepad2.right_bumper) {
+            //fire line up
+            double rot = 0;
+            LLResult llResult = limelight3A.getLatestResult();
+            if(llResult != null & llResult.isValid()){
+                rot = llResult.getTx();
+            }else{
+                rot = -1;
             }
 
+            if(rot == -1){//cant see the tag or other problem
 
+                    drive.drive(0,0,-targetSpeedHigh);
 
-
-
-
-            delayMs(300);
-
-
-
-
-
-
-            //second time
-            rotation = getLLRotationOffset();
-            if (rotation > 0 & rotation != -1) {
-                //positive stuff
-                while (rotation == -1 || rotation > 1) {
-
-                    rotation = getLLRotationOffset();
-                    if (rotation == -1) {
-                        drive.drive(0, 0, -targetSpeedHigh);
-                    } else {
-                        if(abs(rotation) < 10){
-                            targetSpeed = targetSpeedLow;
-                        }else{
-                            targetSpeed = targetSpeedMed;
-                        }
-                        drive.drive(0, 0, -targetSpeed);
-                    }
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-                //drive.drive(0, 0, 0);
-                while (rotation < 0) {
-
-                    rotation = getLLRotationOffset();
-                    drive.drive(0, 0, 0.2);
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-            } else if (rotation < 0 & rotation != -1) {
-                //negative stuff
-                while (rotation == -1 || rotation < -1) {
-
-                    rotation = getLLRotationOffset();
-                    if (rotation == -1) {
-                        drive.drive(0, 0, targetSpeedHigh);
-                    } else {
-                        if(abs(rotation) < 10){
-                            targetSpeed = targetSpeedLow;
-                        }else{
-                            targetSpeed = targetSpeedMed;
-                        }
-                        drive.drive(0, 0, targetSpeed);
-                    }
-
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-                //drive.drive(0, 0, 0);
-                while (rotation > 0) {
-
-                    rotation = getLLRotationOffset();
-                    drive.drive(0, 0, -0.2);
-
-                    telemetry.update();
-                    telemetry.clear();
-                }
-            } else if (rotation == -1) {
-                //invalid stuff
-                if (gamepad1.left_bumper) {
-                    while (rotation == -1 || rotation < -1) {
-
-                        rotation = getLLRotationOffset();
-                        if (rotation == -1) {
-                            drive.drive(0, 0, targetSpeedHigh);
-                        } else {
-                            if(abs(rotation) < 10){
-                                targetSpeed = targetSpeedLow;
-                            }else{
-                                targetSpeed = targetSpeedMed;
-                            }
-                            drive.drive(0, 0, targetSpeed);
-                        }
-
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                    //drive.drive(0, 0, 0);
-                    while (rotation > 0) {
-
-                        rotation = getLLRotationOffset();
-                        drive.drive(0, 0, -0.2);
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                } else if(gamepad1.right_bumper){
-
-                    while (rotation == -1 || rotation > 1) {
-
-                        rotation = getLLRotationOffset();
-                        if (rotation == -1) {
-                            drive.drive(0, 0, -0.6);
-                        } else {
-                            if(abs(rotation) < 10){
-                                targetSpeed = targetSpeedLow;
-                            }else{
-                                targetSpeed = targetSpeedMed;
-                            }
-                            drive.drive(0, 0, -targetSpeed);
-
-                        }
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                    //drive.drive(0, 0, 0);
-                    while (rotation < 0) {
-
-                        rotation = getLLRotationOffset();
-                        drive.drive(0, 0, 0.2);
-
-                        telemetry.update();
-                        telemetry.clear();
-                    }
-                }
-            } else {
-                //handle exception this really shoulden't happen
+            }else{//tag visible
+                if (rot >= 20){drive.drive(0,0,-targetSpeedMed);}
+                else if(rot < 20 & rot > 3){ drive.drive(0,0,-targetSpeedLow);}
+                else if(rot <=3  & rot >= -3){ drive.drive(0,0,0);}
+                else if(rot > -20 & rot < -3){ drive.drive(0,0,targetSpeedLow);}
+                //else if(rot <= -20){drive.drive(0,0,-targetSpeedMed);}
+                else{drive.drive(0,0,0);}//catchall
             }
-            double dist = getLLDistance();
-            if(fire){
-
+        }else if(gamepad2.left_bumper){
+            //fire line up
+            double rot = 0;
+            LLResult llResult = limelight3A.getLatestResult();
+            if(llResult != null & llResult.isValid()){
+                rot = llResult.getTx();
+            }else{
+                rot = -1;
             }
 
+            if(rot == -1){//cant see the tag or other problem
+
+                drive.drive(0,0,targetSpeedHigh);
+
+            }else{//tag visible
+                //if (rot >= 20){drive.drive(0,0,-targetSpeedMed);}
+                /*else*/ if(rot <= -20){drive.drive(0,0,targetSpeedMed);}
+                else if(rot > -20 & rot < -3){ drive.drive(0,0,targetSpeedLow);}
+                else if(rot <=3  & rot >= -3){ drive.drive(0,0,0);}
+                else if(rot < 20 & rot > 3){ drive.drive(0,0,-targetSpeedLow);}
+                else{drive.drive(0,0,0);}//catchall
+            }
+        }else{
+            drive.drive(forward,strafe,rotate);
         }
+        setSpeed = idleSpeed;
+        speedGoal = 0;
+        if(gamepad2.right_trigger > 0.2 || gamepad2.left_trigger > 0.2){//trigger pressed!!!
+            double distance = getLLDistance();
+            if(distance < 30){
+                //nothing
+                setSpeed = idleSpeed;
+                speedGoal = 0;
+            }else if(distance <= 35){
+                setSpeed = 0.6;
+                speedGoal = 500;
+            }else if(distance <= 48){
+                setSpeed = 0.625;
+                speedGoal = 500;
+            }else if(distance <= 85){
+                setSpeed = 0.75;
+                speedGoal = 600;
+            }else if(distance > 85){
+                setSpeed = 0.85;
+                speedGoal = 650;
+            }
+
+        }else{
+            setSpeed = idleSpeed;
+        }
+        if(gamepad2.a){
+            idleSpeed = 0.5;
+        }
+        double velocity = shooterMotor.getVelocity();
+        if(gamepad2.right_trigger > 0.2 & velocity >=speedGoal){
+            rtFire.setPower(-1);
+        }else{
+            rtFire.setPower(0);
+        }
+        if(gamepad2.left_trigger > 0.2 & velocity >=speedGoal){
+            ltFire.setPower(1);
+        }else{
+            ltFire.setPower(0);
+        }
+        shooterMotor.setPower(setSpeed);
+        telemetry.addData("power:",setSpeed);
+        telemetry.addData("speed:",velocity);
+
     }
 
     private double getLLRotationOffset(){
