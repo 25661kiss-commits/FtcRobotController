@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,6 +8,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.TestBenchB;
 import org.firstinspires.ftc.teamcode.mechaisms.TestBenchD;
 
 @TeleOp
+@Disabled
 public class DcMotorTest extends OpMode {
     TestBenchD bench = new TestBenchD();
     TestBenchB button = new TestBenchB();

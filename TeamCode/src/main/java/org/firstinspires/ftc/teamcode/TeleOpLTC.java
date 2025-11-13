@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.tan;
 
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,8 +14,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 @TeleOp
-
-public class MecanumDriveColinOrientated extends OpMode {
+public class TeleOpLTC extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -67,11 +63,9 @@ public class MecanumDriveColinOrientated extends OpMode {
         strafe = -gamepad1.left_stick_x;
         rotate = -gamepad1.right_stick_x;
 
-        if(gamepad1.a) {
-            double speed = getLLRotationOffset();
-        }
+        double speeed = getLLRotationOffset();
         //line up with target
-        if(gamepad2.right_bumper) {
+        if(gamepad1.right_bumper) {
             //fire line up
             double rot = 0;
             LLResult llResult = limelight3A.getLatestResult();
@@ -93,7 +87,7 @@ public class MecanumDriveColinOrientated extends OpMode {
                 //else if(rot <= -20){drive.drive(0,0,-targetSpeedMed);}
                 else{drive.drive(0,0,0);}//catchall
             }
-        }else if(gamepad2.left_bumper){
+        }else if(gamepad1.left_bumper){
             //fire line up
             double rot = 0;
             LLResult llResult = limelight3A.getLatestResult();
@@ -121,6 +115,39 @@ public class MecanumDriveColinOrientated extends OpMode {
         setSpeed = idleSpeed;
         speedGoal = 0;
         if(gamepad2.right_trigger > 0.2 || gamepad2.left_trigger > 0.2){//trigger pressed!!!
+
+            setSpeed = idleSpeed;
+        }else{
+            setSpeed = idleSpeed;
+        }
+        if(gamepad2.a){
+            idleSpeed = 0.525;
+        }
+        if(gamepad2.b){
+            idleSpeed = 0;
+        }
+        if(gamepad2.dpad_up){
+            idleSpeed += 0.025;
+            drive.drive(0,0,0);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if(gamepad2.dpad_down){
+            idleSpeed -= 0.025;
+            drive.drive(0,0,0);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        double velocity = shooterMotor.getVelocity();
+        if(gamepad2.right_trigger > 0.2){
+            rtFire.setPower(-1);
+            /*
             double distance = getLLDistance();
             if(distance < 30){
                 //nothing
@@ -138,22 +165,32 @@ public class MecanumDriveColinOrientated extends OpMode {
             }else if(distance > 85){
                 setSpeed = 0.6;
                 speedGoal = 650;
-            }
-
-        }else{
-            setSpeed = idleSpeed;
-        }
-        if(gamepad2.a){
-            idleSpeed = 0.5;
-        }
-        double velocity = shooterMotor.getVelocity();
-        if(gamepad2.right_trigger > 0.2 & velocity >=speedGoal){
-            rtFire.setPower(-1);
+            }*/
         }else{
             rtFire.setPower(0);
+
         }
-        if(gamepad2.left_trigger > 0.2 & velocity >=speedGoal){
+        if(gamepad2.left_trigger > 0.2){
             ltFire.setPower(1);
+            /*
+            double distance = getLLDistance();
+            if(distance < 30){
+                //nothing
+                setSpeed = idleSpeed;
+                speedGoal = 0;
+            }else if(distance <= 35){
+                setSpeed = 525;
+                speedGoal = 500;
+            }else if(distance <= 48){
+                setSpeed = 0.55;
+                speedGoal = 500;
+            }else if(distance <= 85){
+                setSpeed = 0.575;
+                speedGoal = 600;
+            }else if(distance > 85){
+                setSpeed = 0.6;
+                speedGoal = 650;
+            }*/
         }else{
             ltFire.setPower(0);
         }
