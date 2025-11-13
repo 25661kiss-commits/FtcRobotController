@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.autonomous.PrintODO;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
+@Disabled
 public class AutoFrontBlue extends OpMode {
     private double TPMM = 68.440839782642795137756153472092;//ticks per inch
     private AutoRotateDegrese autoMovements = new AutoRotateDegrese();

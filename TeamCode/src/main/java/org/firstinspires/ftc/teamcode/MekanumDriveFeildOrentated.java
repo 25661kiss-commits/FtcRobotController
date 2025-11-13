@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.MekanumDrive;
 
 @TeleOp
+@Disabled
 public class MekanumDriveFeildOrentated extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     double forward,strafe,rotate;
