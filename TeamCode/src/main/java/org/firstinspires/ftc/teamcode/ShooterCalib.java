@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.tan;
+
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -13,7 +17,8 @@ public class ShooterCalib extends OpMode {
     private DcMotor ltIntake;
     private CRServo rtFire;
     private CRServo ltFire;
-    private double shooterPower = 0;
+    private Limelight3A limelight3A;
+    private double shooterVelocity = 0;
     @Override
     public void init() {
         shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
@@ -21,12 +26,17 @@ public class ShooterCalib extends OpMode {
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         rtFire = hardwareMap.get(CRServo.class,"right_fire_servo");
         ltFire = hardwareMap.get(CRServo.class,"left_fire_servo");
+        limelight3A = hardwareMap.get(Limelight3A.class,"limelight");
+        limelight3A.pipelineSwitch(5);//1 is green
     }
-
+    @Override
+    public void start() {
+        limelight3A.start();
+    }
     @Override
     public void loop() {
         if(gamepad1.dpad_up){
-            shooterPower += 0.025;
+            shooterVelocity += 20;
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -34,7 +44,7 @@ public class ShooterCalib extends OpMode {
             }
         }
         if(gamepad1.dpad_down){
-            shooterPower -= 0.025;
+            shooterVelocity -= 20;
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -53,8 +63,29 @@ public class ShooterCalib extends OpMode {
         }
         ltIntake.setPower(-gamepad1.left_stick_y);
         rtIntake.setPower(-gamepad1.right_stick_y);
-        shooterMotor.setPower(shooterPower);
-        telemetry.addData("power:",shooterPower);
+        if(shooterMotor.getVelocity() < shooterVelocity){
+            shooterMotor.setPower(1);
+        }else{
+            shooterMotor.setPower(0.5);
+        }
+
+        telemetry.addData("power:", shooterVelocity);
         telemetry.addData("speed:",shooterMotor.getVelocity());
+        telemetry.addData("distance:",getLLDistance());
+    }
+    private double getLLDistance(){
+        LLResult llResult = limelight3A.getLatestResult();
+        if (llResult != null & llResult.isValid()) {
+            //telemetry.addData("target X offset", llResult.getTx());
+            //telemetry.addData("Target y offset", llResult.getTy());
+            //telemetry.addData("Target area offset", llResult.getTa());
+            double y = llResult.getTy();
+            double angleRadians = 3.14*((23+y)/180);
+            double targetDist = 26.25 / tan(angleRadians);
+            //telemetry.addData("distance:",targetDist);
+            return targetDist;
+        }else{
+            return -1;
+        }
     }
 }

@@ -71,6 +71,11 @@ public class MecanumDriveTele {
         backRightMotor.setMode(encoderMode);
         backLeftMotor.setMode(encoderMode);
 
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         // imu initalization
         // using rev control hub internal imu
 
@@ -102,17 +107,17 @@ public class MecanumDriveTele {
         double backRightPower = forward + strafe - rotate;
 
         double maxPower = 1.0;
-        double maxSpeed = 0.7;
+        double maxSpeed = 1.0;
 
         maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
         maxPower = Math.max(maxPower, Math.abs(frontRightPower));
         maxPower = Math.max(maxPower, Math.abs(backLeftPower));
         maxPower = Math.max(maxPower, Math.abs(backRightPower));
-
-        frontLeftMotor.setPower(maxSpeed * (frontLeftPower / maxPower));
-        backLeftMotor.setPower(maxSpeed * (backLeftPower / maxPower));
-        frontRightMotor.setPower(maxSpeed * (frontRightPower / maxPower));
-        backRightMotor.setPower(maxSpeed * (backRightPower / maxPower));
+//motor speeds
+        frontLeftMotor.setPower(maxSpeed * (frontLeftPower / maxPower)*0.85);
+        backLeftMotor.setPower(maxSpeed * (backLeftPower / maxPower)*1.1);
+        frontRightMotor.setPower(maxSpeed * (frontRightPower / maxPower)*0.85);
+        backRightMotor.setPower(maxSpeed * (backRightPower / maxPower)*1.1);
     }
 
     public void driveFeildRelative( double forward, double strafe, double rotate){
