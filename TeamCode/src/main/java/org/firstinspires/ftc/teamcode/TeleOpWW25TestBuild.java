@@ -5,11 +5,13 @@ import static java.lang.Math.tan;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -49,6 +51,7 @@ public class TeleOpWW25TestBuild extends OpMode {
         color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right");
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
         imu = drive.getImu();
+        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
@@ -244,11 +247,11 @@ public class TeleOpWW25TestBuild extends OpMode {
         double distance = getLLDistance();
         int TargetVelocity;
         if(distance > 80){
-            TargetVelocity = 730;
+            TargetVelocity = 890;
         }else if(distance < 70 & distance > 40){
-            TargetVelocity = (int) (580 + ((distance - 40)*10));
+            TargetVelocity = (int) (630 + ((distance - 40)*10));
         }else if(distance < 36){
-            TargetVelocity = 580;
+            TargetVelocity = 630;
         }else{
             TargetVelocity = 630;
         }

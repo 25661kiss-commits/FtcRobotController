@@ -17,6 +17,18 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
+
+
+/*
+* reffrence
+* TARGET - aiming
+*
+*
+*
+*
+* */
+
+
 @TeleOp
 public class TeleOpWW26 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
@@ -48,13 +60,14 @@ public class TeleOpWW26 extends OpMode {
 
     @Override
     public void init(){
-        color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left");
+        color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
         color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
         rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right");
         rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
         imu = drive.getImu();
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
+        ltIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
         shooterMotor2 = hardwareMap.get(DcMotorEx.class,"shooter2");
@@ -73,7 +86,7 @@ public class TeleOpWW26 extends OpMode {
         led1.setMode(DigitalChannel.Mode.OUTPUT);
         led2.setMode(DigitalChannel.Mode.OUTPUT);
         led3.setMode(DigitalChannel.Mode.OUTPUT);
-
+        ltIntake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
@@ -89,20 +102,25 @@ public class TeleOpWW26 extends OpMode {
         forward = gamepad1.left_stick_y;
         strafe = (-gamepad1.left_stick_x)*0.5;
         rotate = -gamepad1.right_stick_x;
-
+        if(gamepad1.right_trigger > 0.2 || gamepad1.left_trigger > 0.2){
+            forward = forward*0.25;
+            strafe = strafe*0.25;
+            rotate = rotate*0.25;
+        }
         double speeed = getLLRotationOffset();
         double inject = 0;
-
+        double rot = 0;
+        LLResult llResult = limelight3A.getLatestResult();
+        if(llResult != null & llResult.isValid()){
+            rot = llResult.getTx();
+        }else{
+            rot = -1;
+        }
         //line up with target
-        if(gamepad1.right_bumper) {
+        if(gamepad1.right_bumper) { //TARGET
             //fire line up
-            double rot = 0;
-            LLResult llResult = limelight3A.getLatestResult();
-            if(llResult != null & llResult.isValid()){
-                rot = llResult.getTx();
-            }else{
-                rot = -1;
-            }
+
+
 
             if(rot == -1){//cant see the tag or other problem
 
@@ -110,21 +128,14 @@ public class TeleOpWW26 extends OpMode {
 
             }else{//tag visible
                 if (rot >= 20){drive.drive(0,strafe,-targetSpeedMed);}
-                else if(rot < 20 & rot > 3){ drive.drive(0,strafe,-targetSpeedLow);}
-                else if(rot <=3  & rot >= -3){ drive.drive(0,strafe,0);}
-                else if(rot > -20 & rot < -3){ drive.drive(0,strafe,targetSpeedLow);}
+                else if(rot < 20 & rot > 2){ drive.drive(0,strafe,-targetSpeedLow);}
+                else if(rot <=2  & rot >= -2){ drive.drive(0,strafe,0);}
+                else if(rot > -20 & rot < -2){ drive.drive(0,strafe,targetSpeedLow);}
                 //else if(rot <= -20){drive.drive(0,0,-targetSpeedMed);}
                 else{drive.drive(0,strafe,0);}//catchall
             }
         }else if(gamepad1.left_bumper){
             //fire line up
-            double rot = 0;
-            LLResult llResult = limelight3A.getLatestResult();
-            if(llResult != null & llResult.isValid()){
-                rot = llResult.getTx();
-            }else{
-                rot = -1;
-            }
 
             if(rot == -1){//cant see the tag or other problem
 
@@ -133,9 +144,9 @@ public class TeleOpWW26 extends OpMode {
             }else{//tag visible
                 //if (rot >= 20){drive.drive(0,0,-targetSpeedMed);}
                 /*else*/ if(rot <= -20){drive.drive(0,strafe,targetSpeedMed);}
-                else if(rot > -20 & rot < -3){ drive.drive(0,strafe,targetSpeedLow);}
-                else if(rot <=3  & rot >= -3){ drive.drive(0,strafe,0);}
-                else if(rot < 20 & rot > 3){ drive.drive(0,strafe,-targetSpeedLow);}//you can strafe arround the target
+                else if(rot > -20 & rot < -2){ drive.drive(0,strafe,targetSpeedLow);}
+                else if(rot <=2  & rot >= -2){ drive.drive(0,strafe,0);}
+                else if(rot < 20 & rot > 2){ drive.drive(0,strafe,-targetSpeedLow);}//you can strafe arround the target
                 else{drive.drive(0,strafe,0);}//catchall
             }
         }else{
@@ -174,24 +185,35 @@ public class TeleOpWW26 extends OpMode {
                 throw new RuntimeException(e);
             }
         }
+        double distance = getLLDistance();
+        int TargetVelocity;
+        if(distance > 80){
+            TargetVelocity = 850;//shoot from down town orignal 720
+        }else if(distance < 90 & distance > 40){
+            TargetVelocity = (int) (640 + ((distance - 43)*3.5)); //set the intermediate power orignal 580 dist 70
+        }else if(distance < 36){
+            TargetVelocity = 540;//original 580
+        }else{
+            TargetVelocity = 590;//original 630
+        }
         double velocity = shooterMotor.getVelocity();
-        if(gamepad2.right_bumper){
-            if(rtcolor.getDistance(DistanceUnit.CM) > 3.5){
-                rtFire.setPower(-1);
-                if(rtcolor.getDistance(DistanceUnit.CM) < 3.5 && rtcolor2.getDistance(DistanceUnit.CM) < 3) {
+        if(gamepad2.right_stick_y > 0.5){//sticks not bumper FIRE
+            if(rtcolor.getDistance(DistanceUnit.CM) > 4){
+                //rtFire.setPower(-1);
+                if(rtcolor.getDistance(DistanceUnit.CM) < 4 && rtcolor2.getDistance(DistanceUnit.CM) < 4) {
                     rtIntake.setPower(0);
                 }else{
-                    rtIntake.setPower(-0.5);//right front intake speed
+                    rtIntake.setPower(-1);//right front intake speed change for intake speed
                 }
             }else{
                 rtFire.setPower(0);
-                if(rtcolor.getDistance(DistanceUnit.CM) < 3.5 && rtcolor2.getDistance(DistanceUnit.CM) < 3) {
+                if(rtcolor.getDistance(DistanceUnit.CM) < 4 && rtcolor2.getDistance(DistanceUnit.CM) < 4) {
                     rtIntake.setPower(0);
                 }else{
-                    rtIntake.setPower(-0.5);//right front intake speed
+                    rtIntake.setPower(-1);//right front intake speed change for intake speed
                 }
             }
-        }else if(gamepad2.right_trigger > 0.2){//fire
+        }else if(gamepad2.right_bumper & shooterMotor2.getVelocity() > TargetVelocity - 30 & shooterMotor.getVelocity() > TargetVelocity - 30 & rot > -2 & rot < 2 & !(rot == -1)){//fire
             rtFire.setPower(-1);
             rtIntake.setPower(-1);
             /*
@@ -216,26 +238,26 @@ public class TeleOpWW26 extends OpMode {
 
         }else{
             rtFire.setPower(0);
-            rtIntake.setPower(-gamepad2.right_stick_y);
+            rtIntake.setPower(0);
 
         }
-        if(gamepad2.left_bumper){
-            if(color.getDistance(DistanceUnit.CM) > 3.5){
-                ltFire.setPower(1);
-                if(color.getDistance(DistanceUnit.CM) < 3.5 && color2.getDistance(DistanceUnit.CM) < 3) {
+        if(0 > 0.5){//sticks not bumper FIRE
+            if(color.getDistance(DistanceUnit.CM) > 4){
+                //ltFire.setPower(1);
+                if(color.getDistance(DistanceUnit.CM) < 4 && color2.getDistance(DistanceUnit.CM) < 4) {
                     ltIntake.setPower(0);
                 }else{
-                    ltIntake.setPower(-0.5);//left front intake speed
+                    ltIntake.setPower(-1);//left front intake speed change for intake speed
                 }
             }else{
                 ltFire.setPower(0);
-                if(color.getDistance(DistanceUnit.CM) < 3.5 && color2.getDistance(DistanceUnit.CM) < 3) {
+                if(color.getDistance(DistanceUnit.CM) < 4 && color2.getDistance(DistanceUnit.CM) < 4) {
                     ltIntake.setPower(0);
                 }else{
-                    ltIntake.setPower(-0.5);//left front intake speed
+                    ltIntake.setPower(-1);//left front intake speed change for intake speed
                 }
             }
-        }else if(gamepad2.left_trigger > 0.2){//fire
+        }else if(gamepad2.left_bumper & shooterMotor2.getVelocity() > TargetVelocity - 30 & shooterMotor.getVelocity() > TargetVelocity - 30 && rot > -2 & rot < 2 & !(rot == -1)){//fire
             ltFire.setPower(1);
             ltIntake.setPower(-1);
             /*
@@ -260,37 +282,35 @@ public class TeleOpWW26 extends OpMode {
 
         }else{
             ltFire.setPower(0);
-            ltIntake.setPower(-gamepad2.left_stick_y);
+            ltIntake.setPower(0);
 
         }
-        double distance = getLLDistance();
-        int TargetVelocity;
-        if(distance > 80){
-            TargetVelocity = 730;
-        }else if(distance < 70 & distance > 40){
-            TargetVelocity = (int) (580 + ((distance - 40)*10));
-        }else if(distance < 36){
-            TargetVelocity = 580;
-        }else{
-            TargetVelocity = 630;
-        }
-        if(velocity < TargetVelocity){//speed up
+
+        if(velocity < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
             shooterMotor.setPower(1);
             led0.setState(true);//off leds
             led1.setState(true);
             led2.setState(true);
             led3.setState(true);
+            telemetry.addData("fast",setSpeed);
+
         }else {//fast eneough
             shooterMotor.setPower(0.5);
             led0.setState(false);
             led1.setState(false);
             led2.setState(false);
             led3.setState(false);
+            telemetry.addData("slow",setSpeed);
+
         }
-        if(shooterMotor2.getVelocity() < TargetVelocity){//speed up
+        if(shooterMotor2.getVelocity() < (TargetVelocity + 20)){//speed up /!\ shooter speed adjustments /!\ SHOOT
             shooterMotor2.setPower(1);
+            telemetry.addData("fast",setSpeed);
+
         }else {//fast eneough
             shooterMotor2.setPower(0.5);
+            telemetry.addData("slow",setSpeed);
+
         }
 
 
