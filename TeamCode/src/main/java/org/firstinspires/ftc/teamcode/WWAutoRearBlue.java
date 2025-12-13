@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -17,12 +16,11 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
-public class WWAutoRearRed extends OpMode {
+public class WWAutoRearBlue extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -106,13 +104,13 @@ public class WWAutoRearRed extends OpMode {
 
                 } else {//tag visible
                     if (rot >= 20) {
-                        drive.drive(0, strafe, -targetSpeedMed);
-                    } else if (rot < 20 & rot > 1) {
+                        drive.drive(0, strafe, -targetSpeedMed);//AIMING
+                    } else if (rot < 20 & rot > -5) {
                         drive.drive(0, strafe, -targetSpeedLow);
-                    } else if (rot <= 1 & rot >= -1) {
+                    } else if (rot <= -5 & rot >= -7) {
                         drive.drive(0, strafe, 0);
                         stooop = false;
-                    } else if (rot > -20 & rot < -1) {
+                    } else if (rot > -20 & rot < -7) {
                         drive.drive(0, strafe, targetSpeedLow);
                     }
                     //else if(rot <= -20){drive.drive(0,0,-targetSpeedMed);}
@@ -182,7 +180,7 @@ public class WWAutoRearRed extends OpMode {
             //left turn:
             drive.drive(0,0,0.2);
             odo.update();
-            while(odo.getHeading(AngleUnit.DEGREES) < 1){
+            while(odo.getHeading(AngleUnit.DEGREES) < 2){
                 odo.update();
                 if (shooterMotor.getVelocity() <= 890) {
                     shooterMotor.setPower(1);

@@ -9,10 +9,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 public class ShooterCalib extends OpMode {
     private DcMotorEx shooterMotor;
+    private DcMotorEx shooterMotor2;
     private DcMotor rtIntake;
     private DcMotor ltIntake;
     private CRServo rtFire;
@@ -22,6 +24,8 @@ public class ShooterCalib extends OpMode {
     @Override
     public void init() {
         shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
+        shooterMotor2 = hardwareMap.get(DcMotorEx.class,"shooter2");
+        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         rtFire = hardwareMap.get(CRServo.class,"right_fire_servo");
@@ -68,9 +72,15 @@ public class ShooterCalib extends OpMode {
         }else{
             shooterMotor.setPower(0.5);
         }
+        if(shooterMotor2.getVelocity() < shooterVelocity){
+            shooterMotor2.setPower(1);
+        }else{
+            shooterMotor2.setPower(0.5);
+        }
 
         telemetry.addData("power:", shooterVelocity);
         telemetry.addData("speed:",shooterMotor.getVelocity());
+        telemetry.addData("speed2:",shooterMotor2.getVelocity());
         telemetry.addData("distance:",getLLDistance());
     }
     private double getLLDistance(){
