@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 
@@ -56,8 +57,8 @@ public class TeleOpLS27W3Wheels extends OpMode {
     public void init(){
         color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
         color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
-        rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right");
-        rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
+        rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
+        rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");//compile issue
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
         imu = drive.getImu();
 
@@ -154,9 +155,22 @@ public class TeleOpLS27W3Wheels extends OpMode {
         }else{
             TargetVelocity = 740;//original 630
         }
+        double ltdef = 0;
+        double rtdef = 0;
         double velocity = shooterMotor.getVelocity();
         if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5){// joysticks move intake
             rtIntake.setPower(-1);
+            if(color.getDistance(DistanceUnit.CM) > 4){
+                ltdef= 0.5;
+            }else{
+                ltdef = 0;
+            }
+            if(rtcolor.getDistance(DistanceUnit.CM) > 3.7){
+                rtdef = 0.5;
+
+            }else{
+                rtdef = 0;
+            }
 
         }else if(gamepad2.a){
             rtIntake.setPower(1);
@@ -167,38 +181,48 @@ public class TeleOpLS27W3Wheels extends OpMode {
             if(gamepad2.left_bumper && shooterMotor.getVelocity() > (TargetVelocity - 30)){
                 ltFire.setPower(1);
             }else{
-                ltFire.setPower(0);
+                ltFire.setPower(ltdef);
             }
             if(gamepad2.right_bumper && shooterMotor2.getVelocity() > (TargetVelocity - 30)){
                 rtFire.setPower(-1);
             }else{
-                rtFire.setPower(0);
+                rtFire.setPower(-rtdef);
             }
         }else{
-            ltFire.setPower(0);
-            rtFire.setPower(0);
+            ltFire.setPower(ltdef);
+            rtFire.setPower(-rtdef);
         }
 
 
         if(velocity < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
             shooterMotor.setPower(1);
-            led0.setState(true);//off leds
-            led1.setState(true);
+            //led2.setState(true);//off leds
+            led3.setState(true);
         }else {//fast eneough
             shooterMotor.setPower(0.5);
-            led0.setState(false);
-            led1.setState(false);
+            //led2.setState(false);
+            led3.setState(false);
         }
         if(shooterMotor2.getVelocity() < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
             shooterMotor2.setPower(1);
-            led2.setState(true);
-            led3.setState(true);
+            led0.setState(true);
+            //led1.setState(true);
 
         }else {//fast eneough
             shooterMotor2.setPower(0.5);
-            led2.setState(false);
-            led3.setState(false);
+            led0.setState(false);
+            //led1.setState(false);
 
+        }
+        if(color.getDistance(DistanceUnit.CM) > 3.8){
+            led1.setState(true);
+        }else{
+            led1.setState(false);
+        }
+        if(rtcolor.getDistance(DistanceUnit.CM) > 3.5){
+            led2.setState(true);
+        }else{
+            led2.setState(false);
         }
 
 
