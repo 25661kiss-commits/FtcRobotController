@@ -53,6 +53,7 @@ public class TeleOpLS27W3Wheels extends OpMode {
     private DigitalChannel led2;
     private DigitalChannel led3;
 
+
     @Override
     public void init(){
         color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
@@ -148,8 +149,8 @@ public class TeleOpLS27W3Wheels extends OpMode {
         int TargetVelocity;
         if(distance > 80){
             TargetVelocity = 860;//shoot from down town orignal 720
-        }else if(distance < 90 & distance > 40){
-            TargetVelocity = (int) (700 + ((distance - 43)*3.5)); //set the intermediate power orignal 580 dist 70
+        }else if(distance < 90 & distance > 30){
+            TargetVelocity = (int) (660 + ((distance - 34)*(40/11))); //set the intermediate power orignal 580 dist 70
         }else if(distance < 36){
             TargetVelocity = 700;//original 580
         }else{
@@ -158,15 +159,15 @@ public class TeleOpLS27W3Wheels extends OpMode {
         double ltdef = 0;
         double rtdef = 0;
         double velocity = shooterMotor.getVelocity();
-        if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5){// joysticks move intake
+        if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5 || gamepad2.left_bumper || gamepad2.right_bumper){// joysticks move intake
             rtIntake.setPower(-1);
             if(color.getDistance(DistanceUnit.CM) > 4){
-                ltdef= 0.5;
+                ltdef= 0.25;//was .5
             }else{
                 ltdef = 0;
             }
             if(rtcolor.getDistance(DistanceUnit.CM) > 3.7){
-                rtdef = 0.5;
+                rtdef = 0.25;//was.5
 
             }else{
                 rtdef = 0;
@@ -177,7 +178,7 @@ public class TeleOpLS27W3Wheels extends OpMode {
         }else{
             rtIntake.setPower(0);
         }
-        if(rot < 2 && rot > -2){//dont shoot unless within zone
+        if(rot < 2 && rot > -2 && (!(rot == -1))){//dont shoot unless within zone
             if(gamepad2.left_bumper && shooterMotor.getVelocity() > (TargetVelocity - 30)){
                 ltFire.setPower(1);
             }else{

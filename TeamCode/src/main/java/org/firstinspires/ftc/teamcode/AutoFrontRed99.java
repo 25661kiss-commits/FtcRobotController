@@ -7,6 +7,7 @@ import static java.lang.Math.tan;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -23,7 +25,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
-public class WWAutoFrontRed extends OpMode {
+public class AutoFrontRed99 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -47,12 +49,24 @@ public class WWAutoFrontRed extends OpMode {
     private DigitalChannel led1;
     private DigitalChannel led2;
     private DigitalChannel led3;
+    private DistanceSensor dista;
+    private DistanceSensor distb;
+    private RevColorSensorV3 color;//color sensor rear left
+    private RevColorSensorV3 color2;//color sensor front left
+    private RevColorSensorV3 rtcolor;//color sensor rear left
+    private RevColorSensorV3 rtcolor2;//color sensor front left
     private DcMotorEx shooterMotor2;
     private final double intakeRt = 0.5;
     private final double intakeLt = -0.5;
     @Override
     public void init() {
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
+        dista = hardwareMap.get(DistanceSensor.class,"dist_sensor_right");
+        distb = hardwareMap.get(DistanceSensor.class,"dist_sensor_left");
+        color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
+        color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
+        rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
+        rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");//compile issue
         imu = drive.getImu();
         pin.init(hardwareMap);
         odo = pin.getPinpoint();
@@ -90,12 +104,13 @@ public class WWAutoFrontRed extends OpMode {
     @Override
     public void loop() {
         if(done){
+            delayMs(1000);
             shooterMotor.setPower(1);
             shooterMotor2.setPower(1);
             done = false;
             //once
             double dist = getLLDistance();
-            while(dist < 40){//back up
+            while(dist < 31){//back up
                 dist = getLLDistance();
                 drive.drive(0.5,0,0);
                 double velocity = shooterMotor.getVelocity();
@@ -132,22 +147,32 @@ public class WWAutoFrontRed extends OpMode {
             }
             double velocity = shooterMotor.getVelocity();
 
-            while(velocity <= 630){//wait for shooters to be at speed
+            while(velocity <= 660 & shooterMotor2.getVelocity() <= 660){//wait for shooters to be at speed
                 velocity = shooterMotor.getVelocity();
                 telemetry.addData("speed:",velocity);
-            }
-            ElapsedTime timer = new ElapsedTime();
-            timer.reset();
-
-            while(timer.milliseconds() < 500){//fire first ball(s)
-                rtFire.setPower(intakeLt);
-                ltFire.setPower(-intakeLt);
-                if(shooterMotor.getVelocity() <= 630){
+                if(shooterMotor.getVelocity() <= 660){
                     shooterMotor.setPower(1);
                 }else{
                     shooterMotor.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 630){
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+
+            while(timer.milliseconds() < 1000){//fire first ball(s)
+                rtFire.setPower(intakeLt);
+                ltFire.setPower(-intakeLt);
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
                     shooterMotor2.setPower(1);
                 }else{
                     shooterMotor2.setPower(0.5);
@@ -156,116 +181,199 @@ public class WWAutoFrontRed extends OpMode {
             //fire second ball
             time  = this.getRuntime();
             timer.reset();
-
-            while(timer.milliseconds() < 500){//fire second ball(s)
+            while(velocity <= 660 & shooterMotor2.getVelocity() <= 660){//wait for shooters to be at speed
+                velocity = shooterMotor.getVelocity();
+                telemetry.addData("speed:",velocity);
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
+            timer.reset();
+            while(timer.milliseconds() < 1000){//fire second ball(s)
                 rtIntake.setPower(1);
                 rtFire.setPower(intakeLt);
                 ltFire.setPower(-intakeLt);
-                if(shooterMotor.getVelocity() <= 630){
+                if(shooterMotor.getVelocity() <= 660){
                     shooterMotor.setPower(1);
                 }else{
                     shooterMotor.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 630){
+                if(shooterMotor2.getVelocity() <= 660){
                     shooterMotor2.setPower(1);
                 }else{
                     shooterMotor2.setPower(0.5);
                 }
             }
-            ltIntake.setPower(0);
-            timer.reset();
-            ltIntake.setPower(0);
+            int goodlops = 0;
+            while(goodlops < 12){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) < 2 && odo.getHeading(AngleUnit.DEGREES) > -2){
+                    goodlops++;
+                    drive.drive(0,0,0);
+                }else{
+                    goodlops = 0;
+                    if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                        drive.drive(0,0,-0.2);
+                    }else{
+                        drive.drive(0,0,0.2);
+                    }
+                }
+
+            }
             rtIntake.setPower(0);
+            rtFire.setPower(0);
+            ltFire.setPower(0);
             odo.update();
-
-            //odo.resetPosAndIMU();
-            /*odo.update();
-            drive.drive(0,0,-0.2);
-            // move over to first line of balls
-            while(odo.getHeading(AngleUnit.DEGREES) > -90){
+            while(odo.getPosX(DistanceUnit.CM)< -40){//back up
                 odo.update();
-            }*/
-            odo.update();
+                drive.drive(-0.5,0,0);
 
-            drive.drive(0,0,-0.2);
-            while(odo.getHeading(AngleUnit.DEGREES) > -50){//turn to grab balls
-                odo.update();
-                if(shooterMotor.getVelocity() <= 630){
+                telemetry.addData("speed:",velocity);
+                if(shooterMotor.getVelocity() <= 660){
                     shooterMotor.setPower(1);
                 }else{
                     shooterMotor.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 630){
+                if(shooterMotor2.getVelocity() <= 660){
                     shooterMotor2.setPower(1);
                 }else{
                     shooterMotor2.setPower(0.5);
+                }
+            }
+            double ypos = odo.getPosY(DistanceUnit.CM);
+            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 40){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                    drive.drive(0,-0.5,-0.25);
+                }else{
+                    drive.drive(0,-0.5,0.25);
+                }
+            }
+            goodlops = 0;
+            while(goodlops < 12){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) < 2 && odo.getHeading(AngleUnit.DEGREES) > -2){
+                    goodlops++;
+                    drive.drive(0,0,0);
+                }else{
+                    goodlops = 0;
+                    if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                        drive.drive(0,0,-0.2);
+                    }else{
+                        drive.drive(0,0,0.2);
+                    }
+                }
+
+            }
+            drive.drive(0,-0.2,0);
+            while(dista.getDistance(DistanceUnit.CM) > 33){
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                    drive.drive(0,-0.2,-0.2);
+                }else{
+                    drive.drive(0,-0.2,0.2);
+                }
+            }
+            while(dista.getDistance(DistanceUnit.CM) < 40){
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                    drive.drive(0,-0.2,-0.1);
+                }else{
+                    drive.drive(0,-0.2,0.1);
+                }
+            }
+            shooterMotor2.setPower(0.6);
+            shooterMotor.setPower(0.6);
+            drive.drive(0,0,0);
+            rtIntake.setPower(1);
+            rtFire.setPower(-0.3);
+            drive.drive(-0.15,0,0);
+            while(rtcolor.getDistance(DistanceUnit.CM) > 3){
+
+            }
+            drive.drive(0.0,0,0);
+            rtIntake.setPower(0);
+            rtFire.setPower(0);
+            odo.update();
+            ypos = odo.getPosY(DistanceUnit.CM);
+            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 6){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                    drive.drive(0,-0.2,-0.1);
+                }else{
+                    drive.drive(0,-0.2,0.1);
                 }
             }
             drive.drive(0,0,0);
+            rtIntake.setPower(1);
+            ltFire.setPower(-0.35);
+            drive.drive(-0.15,0,0);
+            while(distb.getDistance(DistanceUnit.CM) > 25){
+                if(color.getDistance(DistanceUnit.CM) <=3){
+                    ltFire.setPower(0);
+                }
+            }
+            drive.drive(0.0,0,0);
+            rtIntake.setPower(0);
+            ltFire.setPower(0);
+            odo.update();
+            ypos = odo.getPosY(DistanceUnit.CM);
+            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 40){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                    drive.drive(0.6,0.6,-0.3);
+                }else{
+                    drive.drive(0.6,0.6,0.3);
+                }
+            }
+            goodlops = 0;
+            while(goodlops < 12){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) < 2 && odo.getHeading(AngleUnit.DEGREES) > -2){
+                    goodlops++;
+                    drive.drive(0,0,0);
+                }else{
+                    goodlops = 0;
+                    if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                        drive.drive(0,0,-0.2);
+                    }else{
+                        drive.drive(0,0,0.2);
+                    }
+                }
 
-            delayMs(500);
-            odo.resetPosAndIMU();
-            delayMs(500);
-            rtIntake.setPower(0.5);
-            drive.drive(-0.3,0,0);
-            odo.update();
-            while(abs(odo.getPosX(DistanceUnit.CM)) < 36){//move forward to grab first 2 balls
-                odo.update();
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
             }
-            rtIntake.setPower(0.75);
-            drive.drive(0,0,0);
-            //odo.resetPosAndIMU();
-            delayMs(500);
-            drive.drive(0,0.2,0);
-            odo.update();
-            rtIntake.setPower(0.75);
-            drive.drive(-0.3,0,0);
-            odo.update();
-            while(abs(odo.getPosX(DistanceUnit.CM)) < 12){//gram thirs ball(s)
-                odo.update();
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
-            drive.drive(0.4,0,0);
-            rtIntake.setPower(0.5);
-            //odo.resetPosAndIMU();
-            delayMs(500);
-            odo.update();
-            while(odo.getPosX(DistanceUnit.CM) > 0){
-                odo.update();
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
+
             drive.drive(0,0,0);
             stooop = true;
             delayMs(400);
-            while(stooop){
+            while(stooop){// aim
                 //fire line up
                 double rot = 0;
                 LLResult llResult = limelight3A.getLatestResult();
@@ -288,21 +396,23 @@ public class WWAutoFrontRed extends OpMode {
                     else{drive.drive(0,strafe,0);}//catchall
 
                 }
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
                 velocity = shooterMotor.getVelocity();
                 telemetry.addData("speed:",velocity);
             }
-            stooop=true;
-            while(stooop){
+            timer.reset();
+            dist = getLLDistance();
+            while(dist < 34 || dist > 36){
+                dist = getLLDistance();
+                if(dist > 35){
+                    drive.drive(-0.2,0,0);
+                }else{
+                    drive.drive(0.2,0,0);
+                }
+            }
+            drive.drive(0,0,0);
+            stooop = true;
+            delayMs(400);
+            while(stooop){// aim
                 //fire line up
                 double rot = 0;
                 LLResult llResult = limelight3A.getLatestResult();
@@ -314,163 +424,116 @@ public class WWAutoFrontRed extends OpMode {
 
                 if(rot == -1){//cant see the tag or other problem
 
-                    //drive.drive(0,0,targetSpeedHigh);
+                    drive.drive(0,0,targetSpeedHigh);
 
                 }else{//tag visible
                     if (rot >= 20){drive.drive(0,strafe,-targetSpeedMed);}
-                    else if(rot < 20 & rot > 1.5){ drive.drive(0,strafe,-targetSpeedLow);}
-                    else if(rot <=1.5  & rot >= -1.5){ drive.drive(0,strafe,0); stooop = false;}
-                    else if(rot > -20 & rot < -1.5){ drive.drive(0,strafe,targetSpeedLow);}
+                    else if(rot < 20 & rot > 3){ drive.drive(0,strafe,-targetSpeedLow);}
+                    else if(rot <=3  & rot >= -3){ drive.drive(0,strafe,0); stooop = false;}
+                    else if(rot > -20 & rot < -3){ drive.drive(0,strafe,targetSpeedLow);}
                     //else if(rot <= -20){drive.drive(0,0,-targetSpeedMed);}
                     else{drive.drive(0,strafe,0);}//catchall
 
                 }
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
                 velocity = shooterMotor.getVelocity();
                 telemetry.addData("speed:",velocity);
             }
-            velocity = shooterMotor.getVelocity();
-            while (getLLDistance() > 41){
-                drive.drive(-0.1,0,0);
-                if(shooterMotor.getVelocity() <= 630){
+            while(!((velocity >= 660 && velocity <=680) && (shooterMotor2.getVelocity() >= 680 && shooterMotor2.getVelocity() <= 680))){//wait for shooters to be at speed
+                velocity = shooterMotor.getVelocity();
+                telemetry.addData("speed:",velocity);
+                if(shooterMotor.getVelocity() <= 660){
                     shooterMotor.setPower(1);
                 }else{
                     shooterMotor.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 630){
+                if(shooterMotor2.getVelocity() <= 660){
                     shooterMotor2.setPower(1);
                 }else{
                     shooterMotor2.setPower(0.5);
                 }
             }
             drive.drive(0,0,0);
-            drive.drive(0,0,0);
-            timer.reset();
-            rtIntake.setPower(0);
-            while(timer.milliseconds() < 500){
-                ltIntake.setPower(intakeLt);
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
 
-            ltIntake.setPower(0);
+            timer.reset();
+            while(timer.milliseconds() < 1000){//fire first ball(s)
+                rtFire.setPower(intakeLt);
+                ltFire.setPower(-intakeLt);
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
             //fire second ball
             time  = this.getRuntime();
+            timer.reset();
+            while(velocity <= 660 & shooterMotor2.getVelocity() <= 660){//wait for shooters to be at speed
+                velocity = shooterMotor.getVelocity();
+                telemetry.addData("speed:",velocity);
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
+            timer.reset();
+            while(timer.milliseconds() < 1000){//fire second ball(s)
+                rtIntake.setPower(1);
+                rtFire.setPower(intakeLt);
+                ltFire.setPower(-intakeLt);
+                if(shooterMotor.getVelocity() <= 660){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= 660){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
+            ltIntake.setPower(0);
+            timer.reset();
+            ltIntake.setPower(0);
+            rtIntake.setPower(0);
+            odo.update();
+            drive.drive(0,0,0);
+            ltIntake.setPower(0);
+            timer.reset();
+            ltIntake.setPower(0);
+            rtIntake.setPower(0);
+            shooterMotor2.setPower(0);
+            shooterMotor.setPower(0);
+            rtFire.setPower(0);
+            ltFire.setPower(0);
+            ltIntake.setPower(0);
+            ypos = odo.getPosY(DistanceUnit.CM);
+            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 70){
+                odo.update();
+                if(odo.getHeading(AngleUnit.DEGREES) > 0){
+                    drive.drive(0,-0.5,-0.25);
+                }else{
+                    drive.drive(0,-0.5,0.25);
+                }
+            }
+            drive.drive(-0.2,0,0);
             delayMs(1000);
-            timer.reset();
-            while(velocity <= 630){
-                velocity = min(shooterMotor.getVelocity(),shooterMotor2.getVelocity());
-                telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
-
-            timer.reset();
-            while(timer.milliseconds() < 500){
-                if(shooterMotor.getVelocity() >= 630)
-                //rtIntake.setPower(1);
-                ltIntake.setPower(intakeLt);
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
-            while(velocity <= 630){
-                velocity = min(shooterMotor.getVelocity(),shooterMotor2.getVelocity());;
-                telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
-            timer.reset();
-            while(timer.milliseconds() < 500){
-                if(shooterMotor.getVelocity() >= 630)
-                    rtIntake.setPower(1);
-                    ltIntake.setPower(intakeLt);
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
             drive.drive(0,0,0);
-
-            drive.drive(0,0,-0.2);
+            ltIntake.setPower(0);
+            timer.reset();
+            ltIntake.setPower(0);
+            rtIntake.setPower(0);
             odo.update();
-            while(odo.getHeading(AngleUnit.DEGREES) > 0){//turn to grab balls
-                odo.update();
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
-            drive.drive(0,0,0);
-            //odo.resetPosAndIMU();
-            delayMs(500);
-            drive.drive(0,-0.2,0);
-            odo.update();
-            while(abs(odo.getPosY(DistanceUnit.CM)) < 40){
-                odo.update();
-                if(shooterMotor.getVelocity() <= 630){
-                    shooterMotor.setPower(1);
-                }else{
-                    shooterMotor.setPower(0.5);
-                }
-                if(shooterMotor2.getVelocity() <= 630){
-                    shooterMotor2.setPower(1);
-                }else{
-                    shooterMotor2.setPower(0.5);
-                }
-            }
             drive.drive(0,0,0);
             ltIntake.setPower(0);
             timer.reset();

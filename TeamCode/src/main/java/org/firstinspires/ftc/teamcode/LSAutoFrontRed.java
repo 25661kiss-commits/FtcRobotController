@@ -50,7 +50,7 @@ public class LSAutoFrontRed extends OpMode {
     private DcMotorEx shooterMotor2;
     private final double intakeRt = 0.5;
     private final double intakeLt = -0.5;
-    private final int shooterTargetSpeed = 630;
+
     @Override
     public void init() {
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -131,7 +131,40 @@ public class LSAutoFrontRed extends OpMode {
                 double velocity = shooterMotor.getVelocity();
                 telemetry.addData("speed:",velocity);
             }
-            shoot_all();
+            drive.drive(0,0,0);
+            int shooterTargetSpeed = 630;
+            while(shooterMotor.getVelocity() < shooterTargetSpeed || shooterMotor2.getVelocity() < shooterTargetSpeed){
+                if(shooterMotor.getVelocity() <= shooterTargetSpeed){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= shooterTargetSpeed){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
+            ElapsedTime timer = new ElapsedTime();
+            //rtIntake.setPower(0.75);
+            ltFire.setPower(1);
+            rtFire.setPower(-1);
+            timer.reset();
+            while(timer.milliseconds() < 750){
+                if(shooterMotor.getVelocity() <= shooterTargetSpeed){
+                    shooterMotor.setPower(1);
+                }else{
+                    shooterMotor.setPower(0.5);
+                }
+                if(shooterMotor2.getVelocity() <= shooterTargetSpeed){
+                    shooterMotor2.setPower(1);
+                }else{
+                    shooterMotor2.setPower(0.5);
+                }
+            }
+            //rtIntake.setPower(0);
+            ltFire.setPower(0);
+            rtFire.setPower(0);
             drive.drive(0,0,0);
             ltIntake.setPower(0);
             ltIntake.setPower(0);
@@ -151,39 +184,7 @@ public class LSAutoFrontRed extends OpMode {
         odo.update();
     }
     void shoot_all(){
-        drive.drive(0,0,0);
-        while(shooterMotor.getVelocity() < shooterTargetSpeed && shooterMotor2.getVelocity() < shooterTargetSpeed){
-            if(shooterMotor.getVelocity() <= shooterTargetSpeed){
-                shooterMotor.setPower(1);
-            }else{
-                shooterMotor.setPower(0.5);
-            }
-            if(shooterMotor2.getVelocity() <= shooterTargetSpeed){
-                shooterMotor2.setPower(1);
-            }else{
-                shooterMotor2.setPower(0.5);
-            }
-        }
-        ElapsedTime timer = new ElapsedTime();
-        //rtIntake.setPower(0.75);
-        ltFire.setPower(1);
-        rtFire.setPower(-1);
-        timer.reset();
-        while(timer.milliseconds() < 750){
-            if(shooterMotor.getVelocity() <= shooterTargetSpeed){
-                shooterMotor.setPower(1);
-            }else{
-                shooterMotor.setPower(0.5);
-            }
-            if(shooterMotor2.getVelocity() <= shooterTargetSpeed){
-                shooterMotor2.setPower(1);
-            }else{
-                shooterMotor2.setPower(0.5);
-            }
-        }
-        //rtIntake.setPower(0);
-        ltFire.setPower(0);
-        rtFire.setPower(0);
+
     }
     private double getLLRotationOffset(){
         LLResult llResult = limelight3A.getLatestResult();

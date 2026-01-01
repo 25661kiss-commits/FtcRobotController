@@ -18,9 +18,9 @@ public class ltSensor extends OpMode {
 
     @Override
     public void init() {
-        color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left");
+        color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
         color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
-        rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right");
+        rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
         rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
     }
 
