@@ -5,6 +5,7 @@ import static java.lang.Math.tan;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @TeleOp
+@Disabled
 public class LimeLightTestTags extends OpMode {
     private double TPMM = 68.440839782642795137756153472092;//ticks per inch
     private Limelight3A limelight3A;

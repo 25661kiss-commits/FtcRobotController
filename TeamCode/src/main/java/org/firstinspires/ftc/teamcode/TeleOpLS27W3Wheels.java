@@ -148,7 +148,7 @@ public class TeleOpLS27W3Wheels extends OpMode {
         double distance = getLLDistance();
         int TargetVelocity;
         if(distance > 80){
-            TargetVelocity = 860;//shoot from down town orignal 720
+            TargetVelocity = (int) (800 + ((distance-82.5)*6.3));//was 860
         }else if(distance < 90 & distance > 30){
             TargetVelocity = (int) (660 + ((distance - 34)*(40/11))); //set the intermediate power orignal 580 dist 70
         }else if(distance < 36){
@@ -161,13 +161,13 @@ public class TeleOpLS27W3Wheels extends OpMode {
         double velocity = shooterMotor.getVelocity();
         if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5 || gamepad2.left_bumper || gamepad2.right_bumper){// joysticks move intake
             rtIntake.setPower(-1);
-            if(color.getDistance(DistanceUnit.CM) > 4){
-                ltdef= 0.25;//was .5
+            if(color.getDistance(DistanceUnit.CM) > 3.6){
+                ltdef= 0.25;//was .25
             }else{
                 ltdef = 0;
             }
-            if(rtcolor.getDistance(DistanceUnit.CM) > 3.7){
-                rtdef = 0.25;//was.5
+            if(rtcolor.getDistance(DistanceUnit.CM) > 3.6){
+                rtdef = 0.25;//was.25
 
             }else{
                 rtdef = 0;
@@ -215,12 +215,12 @@ public class TeleOpLS27W3Wheels extends OpMode {
             //led1.setState(false);
 
         }
-        if(color.getDistance(DistanceUnit.CM) > 3.8){
+        if(color.getDistance(DistanceUnit.CM) > 3.6){
             led1.setState(true);
         }else{
             led1.setState(false);
         }
-        if(rtcolor.getDistance(DistanceUnit.CM) > 3.5){
+        if(rtcolor.getDistance(DistanceUnit.CM) > 3.4){
             led2.setState(true);
         }else{
             led2.setState(false);
