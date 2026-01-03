@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 @TeleOp
+@Disabled
 
 public class MecanumDriveColinOrientated extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();

@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 @TeleOp
+@Disabled
 public class TeleOpWW25TestBuild extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
 import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -19,14 +18,13 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
-public class AutoBackRed99 extends OpMode {
+public class AutoBackBlue99 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -126,7 +124,7 @@ public class AutoBackRed99 extends OpMode {
                 if(rot > -5 && rot < 5){
                     stox = false;
                 }
-                drive.drive(0,0,-0.2);
+                drive.drive(0,0,0.2);
             }
             drive.drive(0,0,0);
             int stooop = 0;
@@ -143,7 +141,7 @@ public class AutoBackRed99 extends OpMode {
 
                 if(rot == -1){//cant see the tag or other problem
 
-                    drive.drive(0,0,targetSpeedHigh);
+                    drive.drive(0,0,-targetSpeedHigh);
 
                 }else{//tag visible
                     if (rot >= 20){drive.drive(0,strafe,-targetSpeedMed);}
@@ -232,15 +230,17 @@ public class AutoBackRed99 extends OpMode {
             }
             shooterMotor2.setPower(0.5);
             shooterMotor.setPower(0.5);
+            shooterMotor2.setPower(0);
+            shooterMotor.setPower(0);
             int goodlops = 0;
             while(goodlops < 12){
                 odo.update();
-                if(odo.getHeading(AngleUnit.DEGREES) < -88 && odo.getHeading(AngleUnit.DEGREES) > -90){
+                if(odo.getHeading(AngleUnit.DEGREES) < 90 && odo.getHeading(AngleUnit.DEGREES) > 88){
                     goodlops++;
                     drive.drive(0,0,0);
                 }else{
                     goodlops = 0;
-                    if(odo.getHeading(AngleUnit.DEGREES) > -89){
+                    if(odo.getHeading(AngleUnit.DEGREES) > 89){
                         drive.drive(0,0,-0.2);
                     }else{
                         drive.drive(0,0,0.2);
@@ -248,6 +248,8 @@ public class AutoBackRed99 extends OpMode {
                 }
 
             }
+            ltFire.setPower(0);
+            rtFire.setPower(0);
             odo.update();
             drive.drive(0,0,0);
             double ypos = odo.getPosY(DistanceUnit.CM);
@@ -256,54 +258,54 @@ public class AutoBackRed99 extends OpMode {
                 odo.update();
             }
             drive.drive(0,0,0);
-            while(distb.getDistance(DistanceUnit.CM) > 23){
-                if(odo.getHeading(AngleUnit.DEGREES) > -90){
-                    drive.drive(0,0.2,-0.1);
+            while(dista.getDistance(DistanceUnit.CM) > 23){
+                if(odo.getHeading(AngleUnit.DEGREES) > 90){
+                    drive.drive(0,-0.2,-0.1);
                 }else{
-                    drive.drive(0,0.2,0.1);
+                    drive.drive(0,-0.2,0.1);
                 }
                 odo.update();
             }
             drive.drive(0,0,0);
             delayMs(1000);
-            while(distb.getDistance(DistanceUnit.CM) < 35){
-                if(odo.getHeading(AngleUnit.DEGREES) > -90){
-                    drive.drive(0,0.2,-0.1);
+            while(dista.getDistance(DistanceUnit.CM) < 35){
+                if(odo.getHeading(AngleUnit.DEGREES) > 90){
+                    drive.drive(0,-0.2,-0.1);
                 }else{
-                    drive.drive(0,0.2,0.1);
+                    drive.drive(0,-0.2,0.1);
                 }
                 odo.update();
             }
             drive.drive(0,0,0);
-            /*delayMs(30000);
-            ltFire.setPower(0.25);
+            //delayMs(30000);
+            /*rtFire.setPower(-0.25);
             rtIntake.setPower(1);
-            while(color.getDistance(DistanceUnit.CM) > 3){
+            while(rtcolor.getDistance(DistanceUnit.CM) > 3){
                 drive.drive(-0.1,0,0);
 
             }
-            ltFire.setPower(0);
+            rtFire.setPower(0);
             rtIntake.setPower(0);
             odo.update();
             ypos = odo.getPosX(DistanceUnit.CM);
             while(abs(ypos-odo.getPosX(DistanceUnit.CM)) < 6) {
-                drive.drive(0,0.2,0);
+                drive.drive(0,-0.2,0);
                 odo.update();
             }
             drive.drive(0,0,0);
             ltIntake.setPower(0);
             //second/third ball grab
             rtIntake.setPower(0.75);
-            rtFire.setPower(-0.25);
+            ltFire.setPower(0.25);
             drive.drive(-0.1,0,0);
-            while(distb.getDistance(DistanceUnit.CM) > 30){
+            while(dista.getDistance(DistanceUnit.CM) > 38){
                 if(color.getDistance(DistanceUnit.CM) <=3){
-                    rtFire.setPower(0);
+                    ltFire.setPower(0);
                 }
             }*/
             drive.drive(0.0,0,0);
             rtIntake.setPower(0);
-            rtFire.setPower(0);
+            ltFire.setPower(0);
 
             ltIntake.setPower(0);
             rtIntake.setPower(0);

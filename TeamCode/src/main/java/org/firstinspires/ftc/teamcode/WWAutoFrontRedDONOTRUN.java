@@ -8,6 +8,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,6 +24,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
+@Disabled
 public class WWAutoFrontRedDONOTRUN extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;

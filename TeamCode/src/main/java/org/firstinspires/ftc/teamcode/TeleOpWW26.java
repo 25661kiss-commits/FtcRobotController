@@ -5,6 +5,7 @@ import static java.lang.Math.tan;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -30,6 +31,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 
 @TeleOp
+@Disabled
 public class TeleOpWW26 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;

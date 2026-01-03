@@ -164,7 +164,7 @@ public class AutoFrontRed99 extends OpMode {
             ElapsedTime timer = new ElapsedTime();
             timer.reset();
 
-            while(timer.milliseconds() < 1000){//fire first ball(s)
+            while(timer.milliseconds() < 1500){//fire first ball(s)
                 rtFire.setPower(intakeLt);
                 ltFire.setPower(-intakeLt);
                 if(shooterMotor.getVelocity() <= 660){
@@ -231,7 +231,7 @@ public class AutoFrontRed99 extends OpMode {
             rtFire.setPower(0);
             ltFire.setPower(0);
             odo.update();
-            while(odo.getPosX(DistanceUnit.CM)< -40){//back up
+            while(odo.getPosX(DistanceUnit.CM)< -40){//back up CHANGE HERE
                 odo.update();
                 drive.drive(-0.5,0,0);
 
@@ -312,10 +312,10 @@ public class AutoFrontRed99 extends OpMode {
             shooterMotor2.setPower(0.6);
             shooterMotor.setPower(0.6);
             drive.drive(0,0,0);
-            rtIntake.setPower(1);
-            rtFire.setPower(-0.3);
-            drive.drive(-0.15,0,0);
-            while(rtcolor.getDistance(DistanceUnit.CM) > 3){
+            rtIntake.setPower(0.65);//was .75
+            rtFire.setPower(-0.2);//was .3
+            drive.drive(-0.1,0,0);
+            while(rtcolor.getDistance(DistanceUnit.CM) > 3.4){
 
             }
             drive.drive(0.0,0,0);
@@ -332,11 +332,11 @@ public class AutoFrontRed99 extends OpMode {
                 }
             }
             drive.drive(0,0,0);
-            rtIntake.setPower(1);
-            ltFire.setPower(-0.35);
-            drive.drive(-0.15,0,0);
+            rtIntake.setPower(0.8);//was .6
+            ltFire.setPower(-0);
+            drive.drive(-0.1,0,0);
             while(distb.getDistance(DistanceUnit.CM) > 25){
-                if(color.getDistance(DistanceUnit.CM) <=3){
+                if(color.getDistance(DistanceUnit.CM) <=3.4){
                     ltFire.setPower(0);
                 }
             }
