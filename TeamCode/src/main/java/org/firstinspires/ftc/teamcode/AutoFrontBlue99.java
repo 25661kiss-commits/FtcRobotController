@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,7 +25,9 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
+@Disabled
 public class AutoFrontBlue99 extends OpMode {
+    final double TagDist= 13.125;
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -272,7 +275,7 @@ public class AutoFrontBlue99 extends OpMode {
 
             }
             drive.drive(0,0.2,0);
-            while(distb.getDistance(DistanceUnit.CM) > 33){//slide over
+            while(distb.getDistance(DistanceUnit.CM) > 30){//slide over
                 if(shooterMotor.getVelocity() <= 660){
                     shooterMotor.setPower(1);
                 }else{
@@ -290,7 +293,7 @@ public class AutoFrontBlue99 extends OpMode {
                     drive.drive(0,0.2,0.2);
                 }
             }
-            while(distb.getDistance(DistanceUnit.CM) < 40){//slide more
+            while(distb.getDistance(DistanceUnit.CM) < 39){//slide more
                 if(shooterMotor.getVelocity() <= 660){
                     shooterMotor.setPower(1);
                 }else{
@@ -331,12 +334,13 @@ public class AutoFrontBlue99 extends OpMode {
                 }
             }
             drive.drive(0,0,0);
-            rtIntake.setPower(0.9);//was .6
+            rtIntake.setPower(0.6);//was .6
             rtFire.setPower(0);
             drive.drive(-0.1,0,0);
-            while(dista.getDistance(DistanceUnit.CM) > 25){//collect second and third ball
+            while(distb.getDistance(DistanceUnit.CM) > 25){//collect second and third ball
                 if(rtcolor.getDistance(DistanceUnit.CM) <=3.4){
                     rtFire.setPower(0);
+                    rtIntake.setPower(0);//was .6
                 }
             }
             drive.drive(0.0,0,0);
@@ -344,7 +348,7 @@ public class AutoFrontBlue99 extends OpMode {
             rtFire.setPower(0);
             odo.update();
             ypos = odo.getPosY(DistanceUnit.CM);
-            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 40){// go back into zone
+            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 36){// go back into zone
                 odo.update();
                 if(odo.getHeading(AngleUnit.DEGREES) > 0){
                     drive.drive(0.6,-0.6,-0.3);
@@ -576,7 +580,7 @@ public class AutoFrontBlue99 extends OpMode {
             telemetry.addData("Target area offset", llResult.getTa());
             double y = llResult.getTy();
             double angleRadians = 3.14*((19+y)/180);
-            double targetDist = 25.25 / tan(angleRadians);
+            double targetDist = TagDist / tan(angleRadians);
             telemetry.addData("distance:",targetDist);
             return targetDist;
         }else{

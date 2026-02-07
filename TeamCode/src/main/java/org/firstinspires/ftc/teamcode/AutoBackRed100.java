@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
 import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -20,7 +19,6 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
@@ -28,8 +26,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
 @Disabled
-public class AutoBackRed99 extends OpMode {
-    final double TagDist= 13.125;
+public class AutoBackRed100 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -236,6 +233,7 @@ public class AutoBackRed99 extends OpMode {
             shooterMotor2.setPower(0.5);
             shooterMotor.setPower(0.5);
             int goodlops = 0;
+
             while(goodlops < 12){
                 odo.update();
                 if(odo.getHeading(AngleUnit.DEGREES) < -88 && odo.getHeading(AngleUnit.DEGREES) > -90){
@@ -253,7 +251,11 @@ public class AutoBackRed99 extends OpMode {
             }
             odo.update();
             drive.drive(0,0,0);
-            double ypos = odo.getPosY(DistanceUnit.CM);
+            drive.drive(-0.5,0,0);
+            delayMs(600);
+            drive.drive(0.0,0,0);
+            rtIntake.setPower(0);
+            /*double ypos = odo.getPosY(DistanceUnit.CM);
             while(abs(ypos - odo.getPosY(DistanceUnit.CM)) < (8.9*3)){
                 drive.drive(-0.2,0,0);
                 odo.update();
@@ -344,13 +346,13 @@ public class AutoBackRed99 extends OpMode {
     private double getLLDistance(){
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null & llResult.isValid()) {
-            telemetry.addData("target X offset", llResult.getTx());
-            telemetry.addData("Target y offset", llResult.getTy());
-            telemetry.addData("Target area offset", llResult.getTa());
+            //telemetry.addData("target X offset", llResult.getTx());
+            //telemetry.addData("Target y offset", llResult.getTy());
+            //telemetry.addData("Target area offset", llResult.getTa());
             double y = llResult.getTy();
-            double angleRadians = 3.14*((18+y)/180);
-            double targetDist = 22.5 / tan(angleRadians);
-            telemetry.addData("distance:",targetDist);
+            double angleRadians = 3.14*((23+y)/180);
+            double targetDist = 26.25 / tan(angleRadians);
+            //telemetry.addData("distance:",targetDist);
             return targetDist;
         }else{
             return -1;

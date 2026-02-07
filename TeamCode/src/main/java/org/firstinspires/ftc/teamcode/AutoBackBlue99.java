@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,7 +25,9 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
+@Disabled
 public class AutoBackBlue99 extends OpMode {
+    final double TagDist= 13.125;
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -58,6 +61,7 @@ public class AutoBackBlue99 extends OpMode {
     private final double intakeRt = 0.5;
     private final double intakeLt = -0.5;
     @Override
+
     public void init() {
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
         dista = hardwareMap.get(DistanceSensor.class,"dist_sensor_right");
@@ -343,13 +347,13 @@ public class AutoBackBlue99 extends OpMode {
     private double getLLDistance(){
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null & llResult.isValid()) {
-            //telemetry.addData("target X offset", llResult.getTx());
-            //telemetry.addData("Target y offset", llResult.getTy());
-            //telemetry.addData("Target area offset", llResult.getTa());
+            telemetry.addData("target X offset", llResult.getTx());
+            telemetry.addData("Target y offset", llResult.getTy());
+            telemetry.addData("Target area offset", llResult.getTa());
             double y = llResult.getTy();
-            double angleRadians = 3.14*((23+y)/180);
-            double targetDist = 26.25 / tan(angleRadians);
-            //telemetry.addData("distance:",targetDist);
+            double angleRadians = 3.14*((18+y)/180);
+            double targetDist = 22.5 / tan(angleRadians);
+            telemetry.addData("distance:",targetDist);
             return targetDist;
         }else{
             return -1;

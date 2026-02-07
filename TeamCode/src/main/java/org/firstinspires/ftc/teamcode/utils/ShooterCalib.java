@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.utils;
 
 import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
+@Disabled
 public class ShooterCalib extends OpMode {
     private DcMotorEx shooterMotor;
     private DcMotorEx shooterMotor2;
@@ -86,13 +88,13 @@ public class ShooterCalib extends OpMode {
     private double getLLDistance(){
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null & llResult.isValid()) {
-            //telemetry.addData("target X offset", llResult.getTx());
-            //telemetry.addData("Target y offset", llResult.getTy());
-            //telemetry.addData("Target area offset", llResult.getTa());
+            telemetry.addData("target X offset", llResult.getTx());
+            telemetry.addData("Target y offset", llResult.getTy());
+            telemetry.addData("Target area offset", llResult.getTa());
             double y = llResult.getTy();
-            double angleRadians = 3.14*((23+y)/180);
-            double targetDist = 26.25 / tan(angleRadians);
-            //telemetry.addData("distance:",targetDist);
+            double angleRadians = 3.14*((18+y)/180);
+            double targetDist = 22.5 / tan(angleRadians);
+            telemetry.addData("distance:",targetDist);
             return targetDist;
         }else{
             return -1;

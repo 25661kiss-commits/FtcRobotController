@@ -1,9 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.utils;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.tan;
 
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -187,8 +186,8 @@ public class MecanumDriveColinOrientated extends OpMode {
             telemetry.addData("Target y offset", llResult.getTy());
             telemetry.addData("Target area offset", llResult.getTa());
             double y = llResult.getTy();
-            double angleRadians = 3.14*((19+y)/180);
-            double targetDist = 25.25 / tan(angleRadians);
+            double angleRadians = 3.14*((18+y)/180);
+            double targetDist = 22.5 / tan(angleRadians);
             telemetry.addData("distance:",targetDist);
             return targetDist;
         }else{

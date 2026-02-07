@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode;
-
-import static java.lang.Double.max;
+package org.firstinspires.ftc.teamcode.utils;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
+//@Disabled
 public class ltSensor extends OpMode {
     private RevColorSensorV3 color;
     private RevColorSensorV3 color2;

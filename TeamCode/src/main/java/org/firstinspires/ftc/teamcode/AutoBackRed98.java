@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
 import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -20,7 +19,6 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
@@ -28,8 +26,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
 @Disabled
-public class AutoBackRed99 extends OpMode {
-    final double TagDist= 13.125;
+public class AutoBackRed98 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -236,7 +233,11 @@ public class AutoBackRed99 extends OpMode {
             shooterMotor2.setPower(0.5);
             shooterMotor.setPower(0.5);
             int goodlops = 0;
-            while(goodlops < 12){
+            drive.drive(-0.5,0,0);
+            delayMs(600);
+            drive.drive(0.0,0,0);
+            rtIntake.setPower(0);
+            /*while(goodlops < 12){
                 odo.update();
                 if(odo.getHeading(AngleUnit.DEGREES) < -88 && odo.getHeading(AngleUnit.DEGREES) > -90){
                     goodlops++;

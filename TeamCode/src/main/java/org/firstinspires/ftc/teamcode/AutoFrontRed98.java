@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
 import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -9,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -25,7 +25,8 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
-public class AutoFrontRed99 extends OpMode {
+@Disabled
+public class AutoFrontRed98 extends OpMode {
     MecanumDriveTele drive = new MecanumDriveTele();
     private Limelight3A limelight3A;
     double forward,strafe,rotate;
@@ -332,7 +333,7 @@ public class AutoFrontRed99 extends OpMode {
                 }
             }
             drive.drive(0,0,0);
-            rtIntake.setPower(0.8);//was .6
+            rtIntake.setPower(0.3);//was .6
             ltFire.setPower(-0);
             drive.drive(-0.1,0,0);
             while(distb.getDistance(DistanceUnit.CM) > 25){
@@ -345,7 +346,7 @@ public class AutoFrontRed99 extends OpMode {
             ltFire.setPower(0);
             odo.update();
             ypos = odo.getPosY(DistanceUnit.CM);
-            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 40){
+            while(abs(ypos-odo.getPosY(DistanceUnit.CM)) < 36){//slide into shooting zone
                 odo.update();
                 if(odo.getHeading(AngleUnit.DEGREES) > 0){
                     drive.drive(0.6,0.6,-0.3);
