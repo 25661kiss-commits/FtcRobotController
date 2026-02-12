@@ -1,4 +1,3 @@
-@Disabled
 ## TeamCode Module
 
 Welcome!
