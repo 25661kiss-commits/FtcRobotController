@@ -158,7 +158,7 @@ public class TeleOpBlue extends OpMode {
         double distance = getLLDistance();
         int TargetVelocity;
         if(distance > 100){
-            TargetVelocity = 740;//was 860
+            TargetVelocity = 760;//was 740
         }else if(distance < 99 & distance > 55){
             TargetVelocity = (int) (660 + ((distance - 55)*1)); //set the intermediate power orignal .9
         }else if(distance < 55 && distance > 0){
@@ -241,7 +241,7 @@ public class TeleOpBlue extends OpMode {
             //led2.setState(true);//off leds
             led3.setState(true);
         }else {//fast eneough
-            shooterMotor.setPower(0.75);
+            shooterMotor.setPower(0.5);
             //led2.setState(false);
             led3.setState(false);
         }
@@ -251,7 +251,7 @@ public class TeleOpBlue extends OpMode {
             //led1.setState(true);
 
         }else {//fast eneough
-            shooterMotor2.setPower(0.75);
+            shooterMotor2.setPower(0.5);
             led0.setState(false);
             //led1.setState(false);
 

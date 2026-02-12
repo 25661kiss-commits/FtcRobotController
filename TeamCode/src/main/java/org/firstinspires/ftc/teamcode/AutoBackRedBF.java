@@ -111,6 +111,7 @@ public class AutoBackRedBF extends OpMode {
     @Override
     public void start() {
         limelight3A.start();
+        delayMs(2500);
     }
     private boolean done = true;
     @Override
@@ -199,7 +200,7 @@ public class AutoBackRedBF extends OpMode {
             rtFire.setPower(-1);
             ltFire.setPower(1);
             timer.reset();
-            while(timer.milliseconds() < 1000){
+            while(timer.milliseconds() < 3000){
                 if(shooterMotor.getVelocity() <= targetspeed){
                     shooterMotor.setPower(1);
                 }else{

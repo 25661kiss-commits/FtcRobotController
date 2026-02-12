@@ -111,7 +111,10 @@ public class AutoBackBlueBF extends OpMode {
     @Override
     public void start() {
         limelight3A.start();
+        delayMs(2000);
     }
+
+
     private boolean done = true;
     @Override
     public void loop() {
@@ -199,7 +202,7 @@ public class AutoBackBlueBF extends OpMode {
             rtFire.setPower(-1);
             ltFire.setPower(1);
             timer.reset();
-            while(timer.milliseconds() < 1000){
+            while(timer.milliseconds() < 3000){
                 if(shooterMotor.getVelocity() <= targetspeed){
                     shooterMotor.setPower(1);
                 }else{
@@ -247,7 +250,6 @@ public class AutoBackBlueBF extends OpMode {
             }
             rtFire.setPower(0);
             ltFire.setPower(0);
-            rtIntake.setPower(0);
             shooterMotor2.setPower(0.5);
             shooterMotor.setPower(0.5);
             shooterMotor2.setPower(0);
@@ -289,7 +291,7 @@ public class AutoBackBlueBF extends OpMode {
                 telemetry.clear();
             }
             //!\\ start of pick up balls------------------------------------------------------------
-            rtIntake.setPower(0);
+
             rtFire.setPower(0);
             odo.update();
             double ypos = odo.getPosX(DistanceUnit.CM);
