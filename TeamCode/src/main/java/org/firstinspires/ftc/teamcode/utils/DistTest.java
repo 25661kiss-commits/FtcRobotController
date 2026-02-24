@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class DistTest extends OpMode {
     DistanceSensor dist;
     DistanceSensor dist2;

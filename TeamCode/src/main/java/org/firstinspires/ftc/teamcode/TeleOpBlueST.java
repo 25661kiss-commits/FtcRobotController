@@ -33,7 +33,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 @TeleOp
 @Disabled
-public class TeleOpRed extends OpMode {
+public class TeleOpBlueST extends OpMode {
     final double TagDist= 13.125;
     MecanumDriveTele drive = new MecanumDriveTele();//drive
     private Limelight3A limelight3A;//limelight obj
@@ -41,8 +41,8 @@ public class TeleOpRed extends OpMode {
     private final double targetSpeedHigh = 0.4;// high target speed
     private final double targetSpeedMed = 0.2;//med turn speed
     private final double targetSpeedLow = 0.1;//slow turning speed
-    private DcMotorEx shooterMotor;//left shooter motor
-    private DcMotorEx shooterMotor2;//right shooter motor
+    private DcMotorEx shooterMotorRight;//left shooter motor
+    private DcMotorEx shooterMotorLeft;//right shooter motor
     private Servo ballStopLeft;
     private Servo ballStopRight;
     private DcMotor rtIntake;//intake
@@ -76,14 +76,14 @@ public class TeleOpRed extends OpMode {
 
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         rtIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
-        shooterMotor2 = hardwareMap.get(DcMotorEx.class,"shooter2");
-        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotorRight = hardwareMap.get(DcMotorEx.class,"shooter_motor");
+        shooterMotorLeft = hardwareMap.get(DcMotorEx.class,"shooter2");
+        shooterMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         rtFire = hardwareMap.get(CRServo.class,"right_fire_servo");
         ltFire = hardwareMap.get(CRServo.class,"left_fire_servo");
         limelight3A = hardwareMap.get(Limelight3A.class,"limelight");
-        limelight3A.pipelineSwitch(5);//1 is green
+        limelight3A.pipelineSwitch(4);//1 is green
         led0 = hardwareMap.get(DigitalChannel.class,"led0");
         led1 = hardwareMap.get(DigitalChannel.class,"led1");
         led2 = hardwareMap.get(DigitalChannel.class,"led2");
@@ -160,7 +160,7 @@ public class TeleOpRed extends OpMode {
         double distance = getLLDistance();
         int TargetVelocity;
         if(distance > 100){
-            TargetVelocity = 760;//was 860,740.
+            TargetVelocity = 900;//was 740
         }else if(distance < 99 & distance > 55){
             TargetVelocity = (int) (660 + ((distance - 55)*1)); //set the intermediate power orignal .9
         }else if(distance < 55 && distance > 0){
@@ -170,25 +170,25 @@ public class TeleOpRed extends OpMode {
         }
         if(gamepad2.x){
             idleSpeed = 660;//back triangle
-            limelight3A.pipelineSwitch(5);
-            while(!(llResult.getPipelineIndex() == 5)){
+            limelight3A.pipelineSwitch(4);
+            while(!(llResult.getPipelineIndex() == 4)){
                 llResult = limelight3A.getLatestResult();
             }
 
         }
         if(gamepad2.b){
             idleSpeed = 740;//front triangle
-            limelight3A.pipelineSwitch(6);
-            while(!(llResult.getPipelineIndex() == 6)){
+            limelight3A.pipelineSwitch(3);
+            while(!(llResult.getPipelineIndex() == 3)){
                 llResult = limelight3A.getLatestResult();
             }
         }
         double ltdef = 0;
         double rtdef = 0;
-        double velocity = shooterMotor.getVelocity();
-        if(gamepad2.left_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotor2.getVelocity() > (TargetVelocity - 10)) {
+        double velocity = shooterMotorRight.getVelocity();
+        if(gamepad2.left_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorLeft.getVelocity() > (TargetVelocity - 10)) {
             rtIntake.setPower(-1);
-        }else if(gamepad2.right_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotor.getVelocity() > (TargetVelocity - 10)){
+        }else if(gamepad2.right_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorRight.getVelocity() > (TargetVelocity - 10)){
             rtIntake.setPower(-1);
         }else if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5){// joysticks move intake
             rtIntake.setPower(-1);
@@ -222,12 +222,12 @@ public class TeleOpRed extends OpMode {
             ballStopRight.setPosition(0.3);
         }
         if(rot < 2 && rot > -2 && (!(rot == -1))){//dont shoot unless within zone
-            if(gamepad2.left_bumper && shooterMotor2.getVelocity() > (TargetVelocity - 10)){
+            if(gamepad2.left_bumper && shooterMotorLeft.getVelocity() > (TargetVelocity - 10)){
                 ltFire.setPower(1);
             }else{
                 ltFire.setPower(ltdef);
             }
-            if(gamepad2.right_bumper && shooterMotor.getVelocity() > (TargetVelocity - 10)){
+            if(gamepad2.right_bumper && shooterMotorRight.getVelocity() > (TargetVelocity - 10)){
                 rtFire.setPower(-1);
             }else{
                 rtFire.setPower(-rtdef);
@@ -239,21 +239,21 @@ public class TeleOpRed extends OpMode {
 
 
         if(velocity < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
-            shooterMotor.setPower(1);
+            shooterMotorRight.setPower(1);
             //led2.setState(true);//off leds
             led3.setState(true);
         }else {//fast eneough
-            shooterMotor.setPower(0.5);
+            shooterMotorRight.setPower(0.5);
             //led2.setState(false);
             led3.setState(false);
         }
-        if(shooterMotor2.getVelocity() < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
-            shooterMotor2.setPower(1);
+        if(shooterMotorLeft.getVelocity() < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
+            shooterMotorLeft.setPower(1);
             led0.setState(true);
             //led1.setState(true);
 
         }else {//fast eneough
-            shooterMotor2.setPower(0.5);
+            shooterMotorLeft.setPower(0.5);
             led0.setState(false);
             //led1.setState(false);
 
@@ -272,7 +272,7 @@ public class TeleOpRed extends OpMode {
 
         telemetry.addData("power:",setSpeed);
         telemetry.addData("speed:",velocity);
-        telemetry.addData("speed2:",shooterMotor2.getVelocity());
+        telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
         telemetry.addData("target",TargetVelocity);
 
 

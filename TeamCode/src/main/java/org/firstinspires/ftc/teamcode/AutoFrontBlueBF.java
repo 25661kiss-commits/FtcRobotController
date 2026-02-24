@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -25,6 +26,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
+@Disabled
 public class AutoFrontBlueBF extends OpMode {
     @Deprecated
     final double TagDist= 13.125;
@@ -34,7 +36,8 @@ public class AutoFrontBlueBF extends OpMode {
     private final double targetSpeedHigh = 0.4;
     private final double targetSpeedMed = 0.4;
     private final double targetSpeedLow = 0.2;
-    private DcMotorEx shooterMotor;
+    private DcMotorEx shooterMotorRight;
+
     private DcMotor rtIntake;
     private DcMotor ltIntake;
     private CRServo rtFire;
@@ -58,7 +61,7 @@ public class AutoFrontBlueBF extends OpMode {
     private RevColorSensorV3 color2;//color sensor front left
     private RevColorSensorV3 rtcolor;//color sensor rear left
     private RevColorSensorV3 rtcolor2;//color sensor front left
-    private DcMotorEx shooterMotor2;
+    private DcMotorEx shooterMotorLeft;
     private final double intakeRt = 0.5;
     private final double intakeLt = -0.5;
     private Servo ballStopLeft;
@@ -77,9 +80,9 @@ public class AutoFrontBlueBF extends OpMode {
         odo = pin.getPinpoint();
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
-        shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
-        shooterMotor2 = hardwareMap.get(DcMotorEx.class,"shooter2");
-        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotorRight = hardwareMap.get(DcMotorEx.class,"shooter_motor");
+        shooterMotorLeft = hardwareMap.get(DcMotorEx.class,"shooter2");
+        shooterMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         ltIntake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -116,8 +119,8 @@ public class AutoFrontBlueBF extends OpMode {
     public void loop() {
         if(done){
             delayMs(1000);
-            shooterMotor.setPower(1);
-            shooterMotor2.setPower(1);
+            shooterMotorRight.setPower(1);
+            shooterMotorLeft.setPower(1);
             ballStopLeft.setPosition(0.7);
             ballStopRight.setPosition(0.7);
             done = false;
@@ -132,17 +135,17 @@ public class AutoFrontBlueBF extends OpMode {
                     drive.drive(0.5, 0, -0.1);
                 }
 
-                double velocity = shooterMotor.getVelocity();
+                double velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 660){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 660){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 660){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 660){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             drive.drive(0,0,0);
@@ -172,33 +175,33 @@ public class AutoFrontBlueBF extends OpMode {
                     else{drive.drive(0,strafe,0);}//catchall
 
                 }
-                double velocity = shooterMotor.getVelocity();
+                double velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 660){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 660){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 660){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 660){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
-            double velocity = shooterMotor.getVelocity();
+            double velocity = shooterMotorRight.getVelocity();
             //!\\ spool up before 1st ball----------------------------------------------------------
-            while(velocity <= 660 & shooterMotor2.getVelocity() <= 660){//wait for shooters to be at speed
-                velocity = shooterMotor.getVelocity();
+            while(velocity <= 660 & shooterMotorLeft.getVelocity() <= 660){//wait for shooters to be at speed
+                velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 660){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 660){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 660){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 660){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             ElapsedTime timer = new ElapsedTime();
@@ -208,49 +211,49 @@ public class AutoFrontBlueBF extends OpMode {
             while(timer.milliseconds() < 1500){//fire first ball(s)
                 rtFire.setPower(intakeLt);
                 ltFire.setPower(-intakeLt);
-                if(shooterMotor.getVelocity() <= 660){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 660){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 660){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 660){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             //fire second ball
             time  = this.getRuntime();
             timer.reset();
             //!\\ spool up before 3rd ball----------------------------------------------------------
-            while(velocity <= 660 & shooterMotor2.getVelocity() <= 660){//wait for shooters to be at speed
-                velocity = shooterMotor.getVelocity();
+            while(velocity <= 660 & shooterMotorLeft.getVelocity() <= 660){//wait for shooters to be at speed
+                velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 660){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 660){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 660){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 660){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             //!\\ wait to shoot 3rd ball------------------------------------------------------------
             timer.reset();
             while(timer.milliseconds() < 700){
-                velocity = shooterMotor.getVelocity();
+                velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
-                if(shooterMotor.getVelocity() <= 680){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 680){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 680){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 680){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             //!\\ shoot 3rd ball--------------------------------------------------------------------
@@ -259,15 +262,15 @@ public class AutoFrontBlueBF extends OpMode {
                 rtIntake.setPower(1);
                 rtFire.setPower(intakeLt);
                 ltFire.setPower(-intakeLt);
-                if(shooterMotor.getVelocity() <= 660){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= 660){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= 660){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= 660){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             //!\\ turn 45 degreees on odo-----------------------------------------------------------
@@ -331,15 +334,15 @@ public class AutoFrontBlueBF extends OpMode {
             timer.reset();
             ltIntake.setPower(0);
             rtIntake.setPower(0);
-            shooterMotor2.setPower(0);
-            shooterMotor.setPower(0);
+            shooterMotorLeft.setPower(0);
+            shooterMotorRight.setPower(0);
             rtFire.setPower(0);
             ltFire.setPower(0);
             ltIntake.setPower(0);
 
 
         }
-        double velocity = shooterMotor.getVelocity();
+        double velocity = shooterMotorRight.getVelocity();
         telemetry.addData("speed:",velocity);
         telemetry.addData("wedd",odo.getHeading(AngleUnit.DEGREES));
 

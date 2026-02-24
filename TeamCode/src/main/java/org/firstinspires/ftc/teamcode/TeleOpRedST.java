@@ -5,7 +5,6 @@ import static java.lang.Math.tan;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -32,8 +31,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 
 @TeleOp
-@Disabled
-public class TeleOpRed extends OpMode {
+public class TeleOpRedST extends OpMode {
     final double TagDist= 13.125;
     MecanumDriveTele drive = new MecanumDriveTele();//drive
     private Limelight3A limelight3A;//limelight obj
@@ -41,17 +39,18 @@ public class TeleOpRed extends OpMode {
     private final double targetSpeedHigh = 0.4;// high target speed
     private final double targetSpeedMed = 0.2;//med turn speed
     private final double targetSpeedLow = 0.1;//slow turning speed
-    private DcMotorEx shooterMotor;//left shooter motor
-    private DcMotorEx shooterMotor2;//right shooter motor
+    private DcMotorEx shooterMotorRight;//left shooter motor
+    private DcMotorEx shooterMotorLeft;//right shooter motor
     private Servo ballStopLeft;
     private Servo ballStopRight;
     private DcMotor rtIntake;//intake
+    private DcMotor ltIntake;//intake
     private CRServo rtFire;//right fire servo
     private CRServo ltFire;//left fire servo
-    private RevColorSensorV3 color;//color sensor rear left
-    private RevColorSensorV3 color2;//color sensor front left
-    private RevColorSensorV3 rtcolor;//color sensor rear left
-    private RevColorSensorV3 rtcolor2;//color sensor front left
+   // private RevColorSensorV3 color;//color sensor rear left
+  //  private RevColorSensorV3 color2;//color sensor front left
+  //  private RevColorSensorV3 rtcolor;//color sensor rear left
+    //private RevColorSensorV3 rtcolor2;//color sensor front left
     private IMU imu;//imu
     private double setSpeed = 0;//motor target speedd
     private DigitalChannel led0;//the leds on the back (red)
@@ -63,10 +62,10 @@ public class TeleOpRed extends OpMode {
 
     @Override
     public void init(){
-        color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
-        color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
-        rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
-        rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");//compile issue
+       // color = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
+      //  color2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_left_front");
+       // rtcolor = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");
+       // rtcolor2 = hardwareMap.get(RevColorSensorV3.class,"color_sensor_right_front");//compile issue
         drive.init(hardwareMap, DcMotor.RunMode.RUN_USING_ENCODER);
         imu = drive.getImu();
         ballStopLeft = hardwareMap.get(Servo.class,"ball_stop_left");
@@ -75,10 +74,12 @@ public class TeleOpRed extends OpMode {
         ballStopRight.setDirection(Servo.Direction.FORWARD);
 
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
+        ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
+        ltIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         rtIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
-        shooterMotor2 = hardwareMap.get(DcMotorEx.class,"shooter2");
-        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotorRight = hardwareMap.get(DcMotorEx.class,"shooter_motor");
+        shooterMotorLeft = hardwareMap.get(DcMotorEx.class,"shooter2");
+        shooterMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         rtFire = hardwareMap.get(CRServo.class,"right_fire_servo");
         ltFire = hardwareMap.get(CRServo.class,"left_fire_servo");
@@ -160,7 +161,7 @@ public class TeleOpRed extends OpMode {
         double distance = getLLDistance();
         int TargetVelocity;
         if(distance > 100){
-            TargetVelocity = 760;//was 860,740.
+            TargetVelocity = 900;//was 860,740.
         }else if(distance < 99 & distance > 55){
             TargetVelocity = (int) (660 + ((distance - 55)*1)); //set the intermediate power orignal .9
         }else if(distance < 55 && distance > 0){
@@ -185,14 +186,14 @@ public class TeleOpRed extends OpMode {
         }
         double ltdef = 0;
         double rtdef = 0;
-        double velocity = shooterMotor.getVelocity();
-        if(gamepad2.left_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotor2.getVelocity() > (TargetVelocity - 10)) {
+        double velocity = shooterMotorRight.getVelocity();
+        if(gamepad2.left_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorLeft.getVelocity() > (TargetVelocity - 10)) {
             rtIntake.setPower(-1);
-        }else if(gamepad2.right_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotor.getVelocity() > (TargetVelocity - 10)){
+        }else if(gamepad2.right_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorRight.getVelocity() > (TargetVelocity - 10)){
             rtIntake.setPower(-1);
         }else if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5){// joysticks move intake
             rtIntake.setPower(-1);
-            if(color.getDistance(DistanceUnit.CM) > 3.6){
+           /* if(color.getDistance(DistanceUnit.CM) > 3.6){
                 ltdef= 0.25;//was .25
             }else{
                 ltdef = 0;
@@ -202,63 +203,59 @@ public class TeleOpRed extends OpMode {
 
             }else{
                 rtdef = 0;
-            }
+            }*/
 
         }else if(gamepad2.y){
             rtIntake.setPower(1);
         }else{
             rtIntake.setPower(0);
         }
-        if(gamepad2.left_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotor2.getVelocity() > (TargetVelocity - 10)*/){
+        if(gamepad2.left_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1))*/ && shooterMotorLeft.getVelocity() > (TargetVelocity - 40)){
 
             ballStopLeft.setPosition(0.7);
         }else{
             ballStopLeft.setPosition(0.25);
         }
-        if(gamepad2.right_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotor.getVelocity() > (TargetVelocity - 10)*/){
+        if(gamepad2.right_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1))*/ && shooterMotorRight.getVelocity() > (TargetVelocity - 40)){
 
             ballStopRight.setPosition(0.7);
         }else{
             ballStopRight.setPosition(0.3);
         }
-        if(rot < 2 && rot > -2 && (!(rot == -1))){//dont shoot unless within zone
-            if(gamepad2.left_bumper && shooterMotor2.getVelocity() > (TargetVelocity - 10)){
-                ltFire.setPower(1);
+        //if(rot < 2 && rot > -2 && (!(rot == -1))){//dont shoot unless within zone
+            if((gamepad2.left_bumper && shooterMotorLeft.getVelocity() > (TargetVelocity - 40)) || (gamepad2.right_bumper && shooterMotorRight.getVelocity() > (TargetVelocity - 40))){
+                ltIntake.setPower(0.5);
             }else{
-                ltFire.setPower(ltdef);
+                ltIntake.setPower(ltdef);
             }
-            if(gamepad2.right_bumper && shooterMotor.getVelocity() > (TargetVelocity - 10)){
-                rtFire.setPower(-1);
-            }else{
-                rtFire.setPower(-rtdef);
-            }
-        }else{
-            ltFire.setPower(ltdef);
-            rtFire.setPower(-rtdef);
-        }
+
+        //}else{
+            //ltFire.setPower(ltdef);
+            //rtFire.setPower(-rtdef);
+        //}
 
 
         if(velocity < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
-            shooterMotor.setPower(1);
+            shooterMotorRight.setPower(1);
             //led2.setState(true);//off leds
             led3.setState(true);
         }else {//fast eneough
-            shooterMotor.setPower(0.5);
+            shooterMotorRight.setPower(0.5);
             //led2.setState(false);
             led3.setState(false);
         }
-        if(shooterMotor2.getVelocity() < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
-            shooterMotor2.setPower(1);
+        if(shooterMotorLeft.getVelocity() < TargetVelocity){//speed up /!\ shooter speed adjustments /!\ SHOOT
+            shooterMotorLeft.setPower(1);
             led0.setState(true);
             //led1.setState(true);
 
         }else {//fast eneough
-            shooterMotor2.setPower(0.5);
+            shooterMotorLeft.setPower(0.5);
             led0.setState(false);
             //led1.setState(false);
 
         }
-        if(color.getDistance(DistanceUnit.CM) > 3.4){
+      /* if(color.getDistance(DistanceUnit.CM) > 3.4){
             led1.setState(true);
         }else{
             led1.setState(false);
@@ -272,8 +269,8 @@ public class TeleOpRed extends OpMode {
 
         telemetry.addData("power:",setSpeed);
         telemetry.addData("speed:",velocity);
-        telemetry.addData("speed2:",shooterMotor2.getVelocity());
-        telemetry.addData("target",TargetVelocity);
+        telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
+        telemetry.addData("target",TargetVelocity);*/
 
 
     }

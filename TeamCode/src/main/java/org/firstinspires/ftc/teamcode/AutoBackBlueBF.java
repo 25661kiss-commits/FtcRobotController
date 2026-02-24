@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -25,6 +26,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @Autonomous
+@Disabled
 public class AutoBackBlueBF extends OpMode {
 
     final double TagDist= 13.125;
@@ -34,7 +36,7 @@ public class AutoBackBlueBF extends OpMode {
     private final double targetSpeedHigh = 0.4;
     private final double targetSpeedMed = 0.2;
     private final double targetSpeedLow = 0.1;
-    private DcMotorEx shooterMotor;
+    private DcMotorEx shooterMotorRight;
     private DcMotor rtIntake;
     private DcMotor ltIntake;
     private CRServo rtFire;
@@ -57,7 +59,7 @@ public class AutoBackBlueBF extends OpMode {
     private RevColorSensorV3 color2;//color sensor front left
     private RevColorSensorV3 rtcolor;//color sensor rear left
     private RevColorSensorV3 rtcolor2;//color sensor front left
-    private DcMotorEx shooterMotor2;
+    private DcMotorEx shooterMotorLeft;
     private final double intakeRt = 0.5;
     private final double intakeLt = -0.5;
     private Servo ballStopLeft;
@@ -76,9 +78,9 @@ public class AutoBackBlueBF extends OpMode {
         odo = pin.getPinpoint();
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
-        shooterMotor = hardwareMap.get(DcMotorEx.class,"shooter_motor");
-        shooterMotor2 = hardwareMap.get(DcMotorEx.class,"shooter2");
-        shooterMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotorRight = hardwareMap.get(DcMotorEx.class,"shooter_motor");
+        shooterMotorLeft = hardwareMap.get(DcMotorEx.class,"shooter2");
+        shooterMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         ltIntake = hardwareMap.get(DcMotor.class,"left_intake_motor");
         rtIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         ltIntake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -119,8 +121,8 @@ public class AutoBackBlueBF extends OpMode {
     @Override
     public void loop() {
         if (done) {
-            shooterMotor2.setPower(1);
-            shooterMotor.setPower(1);
+            shooterMotorLeft.setPower(1);
+            shooterMotorRight.setPower(1);
             ballStopLeft.setPosition(0.7);
             ballStopRight.setPosition(0.7);
             odo.update();
@@ -174,26 +176,26 @@ public class AutoBackBlueBF extends OpMode {
                 if(rot > 2 || rot < -2){
                     stooop = 0;
                 }
-                double velocity = shooterMotor.getVelocity();
+                double velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
                 ModulateSpeed(740);
             }
 
             double dist = getLLDistance();
             double targetspeed = 740;
-            while(shooterMotor2.getVelocity() < targetspeed || shooterMotor.getVelocity() < targetspeed){
-                if(shooterMotor.getVelocity() <= targetspeed){
-                    shooterMotor.setPower(1);
+            while(shooterMotorLeft.getVelocity() < targetspeed || shooterMotorRight.getVelocity() < targetspeed){
+                if(shooterMotorRight.getVelocity() <= targetspeed){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= targetspeed){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= targetspeed){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
-                telemetry.addData("speed1:", shooterMotor.getVelocity());
-                telemetry.addData("speed2:", shooterMotor2.getVelocity());
+                telemetry.addData("speed1:", shooterMotorRight.getVelocity());
+                telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
                 telemetry.addData("speedt:", targetspeed);
                 telemetry.update();
                 telemetry.clear();
@@ -203,31 +205,31 @@ public class AutoBackBlueBF extends OpMode {
             ltFire.setPower(1);
             timer.reset();
             while(timer.milliseconds() < 3000){
-                if(shooterMotor.getVelocity() <= targetspeed){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= targetspeed){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= targetspeed){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= targetspeed){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             //!\\get back up to speed
-            while(shooterMotor2.getVelocity() < targetspeed || shooterMotor.getVelocity() < targetspeed){
-                if(shooterMotor.getVelocity() <= targetspeed){
-                    shooterMotor.setPower(1);
+            while(shooterMotorLeft.getVelocity() < targetspeed || shooterMotorRight.getVelocity() < targetspeed){
+                if(shooterMotorRight.getVelocity() <= targetspeed){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= targetspeed){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= targetspeed){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
-                telemetry.addData("speed1:", shooterMotor.getVelocity());
-                telemetry.addData("speed2:", shooterMotor2.getVelocity());
+                telemetry.addData("speed1:", shooterMotorRight.getVelocity());
+                telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
                 telemetry.addData("speedt:", targetspeed);
                 telemetry.addData("dist:", dist);
                 telemetry.update();
@@ -237,23 +239,23 @@ public class AutoBackBlueBF extends OpMode {
             rtIntake.setPower(0.75);
             timer.reset();
             while(timer.milliseconds() < 1000){
-                if(shooterMotor.getVelocity() <= targetspeed){
-                    shooterMotor.setPower(1);
+                if(shooterMotorRight.getVelocity() <= targetspeed){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= targetspeed){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= targetspeed){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
             }
             rtFire.setPower(0);
             ltFire.setPower(0);
-            shooterMotor2.setPower(0.5);
-            shooterMotor.setPower(0.5);
-            shooterMotor2.setPower(0);
-            shooterMotor.setPower(0);
+            shooterMotorLeft.setPower(0.5);
+            shooterMotorRight.setPower(0.5);
+            shooterMotorLeft.setPower(0);
+            shooterMotorRight.setPower(0);
             //!\\big curved turn--------------------------------------------------------------------
             rtIntake.setPower(0.85);//was .75
             while(abs(odo.getPosX(DistanceUnit.CM)) < 30 && abs(odo.getPosY(DistanceUnit.CM)) < 36){//!\\ control turn
@@ -305,8 +307,8 @@ public class AutoBackBlueBF extends OpMode {
                 ModulateSpeed(740);
             }
             drive.drive(0,0,0);
-            shooterMotor2.setPower(0.6);
-            shooterMotor.setPower(0.6);
+            shooterMotorLeft.setPower(0.6);
+            shooterMotorRight.setPower(0.6);
             ballStopRight.setPosition(0.3);
             ballStopLeft.setPosition(0.25);
             drive.drive(0,0,0);
@@ -375,7 +377,7 @@ public class AutoBackBlueBF extends OpMode {
                 if(rot > 2 || rot < -2){
                     stooop = 0;
                 }
-                double velocity = shooterMotor.getVelocity();
+                double velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
                 ModulateSpeed(740);
             }
@@ -415,17 +417,17 @@ public class AutoBackBlueBF extends OpMode {
                 if(rot > 2 || rot < -2){
                     stooop = 0;
                 }
-                double velocity = shooterMotor.getVelocity();
+                double velocity = shooterMotorRight.getVelocity();
                 telemetry.addData("speed:",velocity);
                 ModulateSpeed(740);
             }
 
             dist = getLLDistance();
             targetspeed = 740;
-            while(shooterMotor2.getVelocity() < targetspeed || shooterMotor.getVelocity() < targetspeed){
+            while(shooterMotorLeft.getVelocity() < targetspeed || shooterMotorRight.getVelocity() < targetspeed){
                 ModulateSpeed(740);
-                telemetry.addData("speed1:", shooterMotor.getVelocity());
-                telemetry.addData("speed2:", shooterMotor2.getVelocity());
+                telemetry.addData("speed1:", shooterMotorRight.getVelocity());
+                telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
                 telemetry.addData("speedt:", targetspeed);
                 telemetry.update();
                 telemetry.clear();
@@ -439,19 +441,19 @@ public class AutoBackBlueBF extends OpMode {
                 ModulateSpeed(740);
             }
             //!\\get back up to speed
-            while(shooterMotor2.getVelocity() < targetspeed || shooterMotor.getVelocity() < targetspeed){
-                if(shooterMotor.getVelocity() <= targetspeed){
-                    shooterMotor.setPower(1);
+            while(shooterMotorLeft.getVelocity() < targetspeed || shooterMotorRight.getVelocity() < targetspeed){
+                if(shooterMotorRight.getVelocity() <= targetspeed){
+                    shooterMotorRight.setPower(1);
                 }else{
-                    shooterMotor.setPower(0.5);
+                    shooterMotorRight.setPower(0.5);
                 }
-                if(shooterMotor2.getVelocity() <= targetspeed){
-                    shooterMotor2.setPower(1);
+                if(shooterMotorLeft.getVelocity() <= targetspeed){
+                    shooterMotorLeft.setPower(1);
                 }else{
-                    shooterMotor2.setPower(0.5);
+                    shooterMotorLeft.setPower(0.5);
                 }
-                telemetry.addData("speed1:", shooterMotor.getVelocity());
-                telemetry.addData("speed2:", shooterMotor2.getVelocity());
+                telemetry.addData("speed1:", shooterMotorRight.getVelocity());
+                telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
                 telemetry.addData("speedt:", targetspeed);
                 telemetry.addData("dist:", dist);
                 telemetry.update();
@@ -467,10 +469,10 @@ public class AutoBackBlueBF extends OpMode {
             rtFire.setPower(0);
             ltFire.setPower(0);
             rtIntake.setPower(0);
-            shooterMotor2.setPower(0.5);
-            shooterMotor.setPower(0.5);
-            shooterMotor2.setPower(0);
-            shooterMotor.setPower(0);
+            shooterMotorLeft.setPower(0.5);
+            shooterMotorRight.setPower(0.5);
+            shooterMotorLeft.setPower(0);
+            shooterMotorRight.setPower(0);
 
             ltIntake.setPower(0);
             rtIntake.setPower(0);
@@ -481,8 +483,8 @@ public class AutoBackBlueBF extends OpMode {
 
             ltIntake.setPower(0);
             rtIntake.setPower(0);
-            shooterMotor2.setPower(0);
-            shooterMotor.setPower(0);
+            shooterMotorLeft.setPower(0);
+            shooterMotorRight.setPower(0);
             rtFire.setPower(0);
             ltFire.setPower(0);
             ltIntake.setPower(0);
@@ -533,15 +535,15 @@ public class AutoBackBlueBF extends OpMode {
         }
     }
     private void ModulateSpeed(int targetspeed){
-        if(shooterMotor.getVelocity() <= targetspeed){
-            shooterMotor.setPower(1);
+        if(shooterMotorRight.getVelocity() <= targetspeed){
+            shooterMotorRight.setPower(1);
         }else{
-            shooterMotor.setPower(0.5);
+            shooterMotorRight.setPower(0.5);
         }
-        if(shooterMotor2.getVelocity() <= targetspeed){
-            shooterMotor2.setPower(1);
+        if(shooterMotorLeft.getVelocity() <= targetspeed){
+            shooterMotorLeft.setPower(1);
         }else{
-            shooterMotor2.setPower(0.5);
+            shooterMotorLeft.setPower(0.5);
         }
         /*telemetry.addData("speed1:", shooterMotor.getVelocity());
         telemetry.addData("speed2:", shooterMotor2.getVelocity());
