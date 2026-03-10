@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class ltSensor extends OpMode {
     private RevColorSensorV3 color;
     private RevColorSensorV3 color2;

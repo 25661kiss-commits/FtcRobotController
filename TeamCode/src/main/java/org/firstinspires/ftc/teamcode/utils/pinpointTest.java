@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.mechaisms.gobuildaPinpoint;
 
 @TeleOp
+@Disabled
 public class pinpointTest extends OpMode {
     gobuildaPinpoint pin = new gobuildaPinpoint();
     GoBildaPinpointDriver odo;

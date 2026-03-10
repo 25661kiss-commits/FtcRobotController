@@ -9,20 +9,20 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.mechaisms.ShooterAuto;
+import org.firstinspires.ftc.teamcode.mechaisms.ShooterAutoFront;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous
-public class AutoBackBluePST extends OpMode {
+public class AutoFrontBluePST extends OpMode {
     private Limelight3A limelight3A;//limelight obj
     private Follower follower;
     private Timer pathtimer;
     private Timer opmodeTimer;
-    private ShooterAuto shooter;
+    private ShooterAutoFront shooter;
     boolean isPathingOn = true;
 
     public enum  PathState{
@@ -47,11 +47,11 @@ public class AutoBackBluePST extends OpMode {
 
     }
     PathState pathState;
-    private final Pose startPose = new Pose(59.5,5.5,Math.toRadians(90));
-    private final Pose shootPose = new Pose(59.5,15,Math.toRadians(111));
-    private  final Pose endPose = new Pose(34,11.49,Math.toRadians(180));
-    private  final Pose ballsPose = new Pose(22.35,11.49,Math.toRadians(180));
-    private final Pose balls2Pose = new Pose(45.88,23.74,Math.toRadians(140));
+    private final Pose startPose = new Pose(22,125,Math.toRadians(135));
+    private final Pose shootPose = new Pose(51.6,95.6,Math.toRadians(135));
+    private  final Pose endPose = new Pose(43.35,94.25,Math.toRadians(198));
+    private  final Pose ballsPose = new Pose(24.5,91.5,Math.toRadians(198));
+    private final Pose balls2Pose = new Pose(40.35,90.25,Math.toRadians(198));
     private final Pose picupBalls2Pose = new Pose(34.51,36.07,Math.toRadians(140));
     private  final Pose balls4Pose = new Pose(22.35,15.49,Math.toRadians(180));
 
@@ -104,14 +104,14 @@ public class AutoBackBluePST extends OpMode {
                 break;
             case STALL_A_BIT:
                 if(!follower.isBusy() && pathtimer.getElapsedTimeSeconds() > 3.5) {
-                    shooter.setShooterState(ShooterAuto.ShooterState.SHOOT);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.SHOOT);
                     setPathState(PathState.SHOOT_PRELOAD);
                 }
                 break;
             case SHOOT_PRELOAD:
                 //is folower don with path
 
-                if(!follower.isBusy() && pathtimer.getElapsedTimeSeconds()  > 2.75){
+                if(!follower.isBusy() && pathtimer.getElapsedTimeSeconds()  > 2.75){//was 2.75
                     telemetry.addLine("done path 1");
                     follower.followPath(driveShootToEnd);
                     setPathState(PathState.DRIVE_SHOOT_END);
@@ -119,7 +119,7 @@ public class AutoBackBluePST extends OpMode {
                 break;
             case DRIVE_SHOOT_END:
                 //all done
-                shooter.setShooterState(ShooterAuto.ShooterState.IDLE);
+                shooter.setShooterState(ShooterAutoFront.ShooterState.IDLE);
                 if(!follower.isBusy()){
                     telemetry.addLine ("done all paths");
                     follower.followPath(driveEndToBalls);
@@ -140,7 +140,7 @@ public class AutoBackBluePST extends OpMode {
                 //all done
                 if(!follower.isBusy() && pathtimer.getElapsedTimeSeconds()  > 2){
                     telemetry.addLine ("done all paths");
-                    shooter.setShooterState(ShooterAuto.ShooterState.SHOOT);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.SHOOT);
                     setPathState(PathState.SHOOT_BALLS2);
                 }
                 break;
@@ -148,7 +148,7 @@ public class AutoBackBluePST extends OpMode {
                 if(pathtimer.getElapsedTimeSeconds()  > 3.25){
                     telemetry.addLine ("done all paths");
                     follower.followPath(driveShootToBalls2);
-                    shooter.setShooterState(ShooterAuto.ShooterState.IDLE);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.IDLE);
                     setPathState(PathState.DRIVE_SHOOT_BALLS2);
                 }
 
@@ -157,8 +157,8 @@ public class AutoBackBluePST extends OpMode {
             case DRIVE_SHOOT_BALLS2:
                 if(!follower.isBusy()){
                     telemetry.addLine ("done all paths");
-                    setPathState(PathState.PICKUP_BALLS2);
-                    follower.followPath(drivePickupBalls2);
+                    //setPathState(PathState.PICKUP_BALLS2);
+                    //follower.followPath(drivePickupBalls2);
                     shooter.FrontIntake.setPower(1);
                 }
                 break;
@@ -174,7 +174,7 @@ public class AutoBackBluePST extends OpMode {
                 if(!follower.isBusy() && pathtimer.getElapsedTimeSeconds()  > 2){
                     telemetry.addLine ("done all paths");
 
-                    shooter.setShooterState(ShooterAuto.ShooterState.SHOOT);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.SHOOT);
 
 
                     setPathState(PathState.SHOOT_BALLS_3);
@@ -184,7 +184,7 @@ public class AutoBackBluePST extends OpMode {
                 if(pathtimer.getElapsedTimeSeconds()  > 3){
                     telemetry.addLine ("done all paths");
                     setPathState(PathState.DRIVE_GRAB_BALLS_3);
-                    shooter.setShooterState(ShooterAuto.ShooterState.IDLE);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.IDLE);
                     follower.followPath(driveShootToEnd);
                     shooter.FrontIntake.setPower(1);
 
@@ -210,14 +210,14 @@ public class AutoBackBluePST extends OpMode {
             case SHOOT_BALLS_4:
                 if(!follower.isBusy()){
                     telemetry.addLine ("done all paths");
-                    shooter.setShooterState(ShooterAuto.ShooterState.SHOOT);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.SHOOT);
                     setPathState(PathState.FINISH);
                 }
                 break;
             case FINISH:
                 if(pathtimer.getElapsedTimeSeconds()  > 3){
                     telemetry.addLine ("done all paths");
-                    shooter.setShooterState(ShooterAuto.ShooterState.IDLE);
+                    shooter.setShooterState(ShooterAutoFront.ShooterState.IDLE);
                     follower.followPath(driveShootToBalls2);
 
                 }
@@ -239,7 +239,7 @@ public class AutoBackBluePST extends OpMode {
         pathState = PathState.DRIVE_STARTPOS_SHOOT_POS;
         pathtimer = new Timer();
         opmodeTimer = new Timer();
-        shooter = new ShooterAuto(hardwareMap);
+        shooter = new ShooterAutoFront(hardwareMap);
         //opmodeTimer.resetTimer();
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
@@ -247,8 +247,8 @@ public class AutoBackBluePST extends OpMode {
         shooter.FrontIntake = hardwareMap.get(DcMotor.class,"right_intake_motor");
         shooter.FrontIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter.FrontIntake.setPower(0);
-        shooter.setShooterState(ShooterAuto.ShooterState.IDLE);
-        shooter.targetSpeed = 860;
+        shooter.setShooterState(ShooterAutoFront.ShooterState.IDLE);
+        shooter.targetSpeed = 740;
         telemetry.addData("shooterSpeedLeft",shooter.leftShooter.getVelocity());
         telemetry.addData("shooterSpeedRight",shooter.rightShooter.getVelocity());
     }

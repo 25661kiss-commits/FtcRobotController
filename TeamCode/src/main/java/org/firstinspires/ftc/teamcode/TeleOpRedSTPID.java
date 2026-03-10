@@ -4,8 +4,6 @@ import static java.lang.Math.tan;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -15,8 +13,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.mechaisms.LinearMapper;
 import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 
 
@@ -30,9 +29,10 @@ import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
 *
 * */
 
-@Disabled
+
 @TeleOp
-public class TeleOpRedST extends OpMode {
+public class TeleOpRedSTPID extends OpMode {
+    private LinearMapper distanceSpeedMapper = new LinearMapper();//linear regreshion
     final double TagDist= 13.125;
     MecanumDriveTele drive = new MecanumDriveTele();//drive
     private Limelight3A limelight3A;//limelight obj
@@ -40,6 +40,9 @@ public class TeleOpRedST extends OpMode {
     private final double targetSpeedHigh = 0.4;// high target speed
     private final double targetSpeedMed = 0.2;//med turn speed
     private final double targetSpeedLow = 0.1;//slow turning speed
+    private final double rotTolerance = 1;//new aim tolerance
+    private /*final*/ double KP = 0.03;//new aim tolerance
+    private /*final*/ double KD = 0.0027;//new aim derivitive
     private DcMotorEx shooterMotorRight;//left shooter motor
     private DcMotorEx shooterMotorLeft;//right shooter motor
     private Servo ballStopLeft;
@@ -59,7 +62,14 @@ public class TeleOpRedST extends OpMode {
     private DigitalChannel led2;
     private DigitalChannel led3;
     private int idleSpeed = 660;
+    double lastError;
+    double curTime;
+    double lastTime;
+    //----------------------tuning TEMPORARY
+    /*double[] stepSizes = {0.1,0.01,0.001,0.0001};
+    int stepIndex = 1;*/
 
+    // end TEMPORARY
 
     @Override
     public void init(){
@@ -94,12 +104,16 @@ public class TeleOpRedST extends OpMode {
         led1.setMode(DigitalChannel.Mode.OUTPUT);
         led2.setMode(DigitalChannel.Mode.OUTPUT);
         led3.setMode(DigitalChannel.Mode.OUTPUT);
-
+        distanceSpeedMapper.add(90,700);
+        distanceSpeedMapper.add(135,780);
+        distanceSpeedMapper.add(164,800);
     }
 
     @Override
     public void start() {
         limelight3A.start();
+        resetRuntime();
+        curTime = getRuntime();
     }
 
     @Override
@@ -123,55 +137,71 @@ public class TeleOpRedST extends OpMode {
         }else{
             rot = -1;
         }
-        //line up with target
-        if(gamepad1.right_bumper) { //TARGET
-            //fire line up
+        //-------------------------aiming----------------------------------
+        double rotError = 0 - rot;
+        if(rot != -1) {
+            //line up with target
+            if (gamepad1.right_bumper || gamepad1.left_bumper) { //TARGET
+                //fire line up
+                if (Math.abs(rotError) < rotTolerance) {
+                    rotate = 0;
+                }else{
+                    double Pterm = rotError * KP;
+                    curTime = getRuntime();
+                    double dT = curTime - lastTime;
+                    double Dterm = ((rotError - lastError) / dT) * KD;
+                    rotate = Range.clip(Pterm + Dterm,-0.4,0.4);
+                    lastError = rotError;
+                    lastTime = curTime;
+                }
 
-
-
-            if(rot == -1){//cant see the tag or other problem
-
-                    drive.drive(0,0,-targetSpeedHigh);
-
-            }else{//tag visible
-                if (rot >= 20){drive.drive(0,strafe,-targetSpeedMed);}
-                else if(rot < 20 & rot > 2){ drive.drive(0,strafe,-targetSpeedLow);}
-                else if(rot <=2  & rot >= -2){ drive.drive(0,strafe,0);}
-                else if(rot > -20 & rot < -2){ drive.drive(0,strafe,targetSpeedLow);}
-                //else if(rot <= -20){drive.drive(0,0,-targetSpeedMed);}
-                else{drive.drive(0,strafe,0);}//catchall
-            }
-        }else if(gamepad1.left_bumper){
-            //fire line up
-
-            if(rot == -1){//cant see the tag or other problem
-
-                drive.drive(0,0,targetSpeedHigh);
-
-            }else{//tag visible
-                //if (rot >= 20){drive.drive(0,0,-targetSpeedMed);}
-                /*else*/ if(rot <= -20){drive.drive(0,strafe,targetSpeedMed);}
-                else if(rot > -20 & rot < -2){ drive.drive(0,strafe,targetSpeedLow);}
-                else if(rot <=2  & rot >= -2){ drive.drive(0,strafe,0);}
-                else if(rot < 20 & rot > 2){ drive.drive(0,strafe,-targetSpeedLow);}//you can strafe arround the target
-                else{drive.drive(0,strafe,0);}//catchall
+            }else{
+                lastError = 0;
+                lastTime = getRuntime();
             }
         }else{
-            drive.drive(forward,strafe,rotate);
+            lastError = 0;
+            lastTime = getRuntime();
         }
+        drive.drive(forward,strafe,rotate);
+        // ---------- TEPORARY -----------------------------------------
+        /*if(gamepad1.bWasPressed()){
+            stepIndex = (stepIndex + 1) % stepSizes.length;
+        }
+        if(gamepad1.dpadLeftWasPressed()){
+            KP -= stepSizes[stepIndex];
+        }
+        if(gamepad1.dpadRightWasPressed()){
+            KP += stepSizes[stepIndex];
+        }
+        if(gamepad1.dpadUpWasPressed()){
+            KD -= stepSizes[stepIndex];
+        }
+        if(gamepad1.dpadDownWasPressed()){
+            KD += stepSizes[stepIndex];
+        }
+        telemetry.addData("KP",KP);
+        telemetry.addData("KD",KD);
+        telemetry.addData("stepSize",stepSizes[stepIndex]);
+        //                 END TEPORARY*/
         double distance = getLLDistance();
+        telemetry.addData("linearMapperResult",distanceSpeedMapper.calculate(distance));
+
+        /*distanceSpeedMapper.add(90,700);
+        distanceSpeedMapper.add(135,780);
+        distanceSpeedMapper.add(164,800);*/
         int TargetVelocity;
-        if(distance > 100){
-            TargetVelocity = 900;//was 860,740.
-        }else if(distance < 99 & distance > 55){
-            TargetVelocity = (int) (660 + ((distance - 55)*1)); //set the intermediate power orignal .9
+        if(distance > 170){
+            TargetVelocity = 880;//was 860,740.
+        }else if(distance < 169 & distance > 55){
+            TargetVelocity = (int) distanceSpeedMapper.calculate(distance);//(700 + ((distance - 90)*1.35)); //set the intermediate power orignal .9
         }else if(distance < 55 && distance > 0){
-            TargetVelocity = 660;//original 580
+            TargetVelocity = 700;//original 580
         }else{
             TargetVelocity = idleSpeed;//original 630
         }
         if(gamepad2.x){
-            idleSpeed = 660;//back triangle
+            idleSpeed = 700;//back triangle
             limelight3A.pipelineSwitch(5);
             while(!(llResult.getPipelineIndex() == 5)){
                 llResult = limelight3A.getLatestResult();
@@ -179,7 +209,7 @@ public class TeleOpRedST extends OpMode {
 
         }
         if(gamepad2.b){
-            idleSpeed = 740;//front triangle
+            idleSpeed = 860;//front triangle
             limelight3A.pipelineSwitch(6);
             while(!(llResult.getPipelineIndex() == 6)){
                 llResult = limelight3A.getLatestResult();
@@ -188,9 +218,9 @@ public class TeleOpRedST extends OpMode {
         double ltdef = 0;
         double rtdef = 0;
         double velocity = shooterMotorRight.getVelocity();
-        if(gamepad2.left_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorLeft.getVelocity() > (TargetVelocity - 10)) {
+        if(gamepad2.left_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorLeft.getVelocity() > (TargetVelocity - 30)) {
             rtIntake.setPower(-1);
-        }else if(gamepad2.right_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorRight.getVelocity() > (TargetVelocity - 10)){
+        }else if(gamepad2.right_bumper && rot < 2 && rot > -2 && (!(rot == -1)) && shooterMotorRight.getVelocity() > (TargetVelocity - 30)){
             rtIntake.setPower(-1);
         }else if(gamepad2.left_stick_y > 0.5 || gamepad2.right_stick_y > 0.5){// joysticks move intake
             rtIntake.setPower(-1);
@@ -211,21 +241,22 @@ public class TeleOpRedST extends OpMode {
         }else{
             rtIntake.setPower(0);
         }
-        if(gamepad2.left_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1))*/ && shooterMotorLeft.getVelocity() > (TargetVelocity - 40)){
+        if(gamepad2.left_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1))*/ && shooterMotorLeft.getVelocity() > (TargetVelocity - 30)){
 
-            ballStopLeft.setPosition(0.3);//open leftservo
+
+            ballStopLeft.setPosition(0.3);
         }else{
-            ballStopLeft.setPosition(0.0);//close leftservo
+            ballStopLeft.setPosition(0);
         }
-        if(gamepad2.right_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1))*/ && shooterMotorRight.getVelocity() > (TargetVelocity - 40)){
+        if(gamepad2.right_bumper /*&& rot < 2 && rot > -2 && (!(rot == -1))*/ && shooterMotorRight.getVelocity() > (TargetVelocity - 30)){
 
             ballStopRight.setPosition(0.7);
         }else{
             ballStopRight.setPosition(0.3);
         }
         //if(rot < 2 && rot > -2 && (!(rot == -1))){//dont shoot unless within zone
-            if((gamepad2.left_bumper && shooterMotorLeft.getVelocity() > (TargetVelocity - 40)) || (gamepad2.right_bumper && shooterMotorRight.getVelocity() > (TargetVelocity - 40))){
-                ltIntake.setPower(0.5);
+            if(((gamepad2.left_bumper && shooterMotorLeft.getVelocity() > (TargetVelocity - 20)) || (gamepad2.right_bumper && shooterMotorRight.getVelocity() > (TargetVelocity - 30))) && rot < 2 && rot > -2 && (!(rot == -1))){
+                ltIntake.setPower(0.75);
             }else{
                 ltIntake.setPower(ltdef);
             }
@@ -269,9 +300,12 @@ public class TeleOpRedST extends OpMode {
 
 
         telemetry.addData("power:",setSpeed);
+        */
+
         telemetry.addData("speed:",velocity);
         telemetry.addData("speed2:", shooterMotorLeft.getVelocity());
-        telemetry.addData("target",TargetVelocity);*/
+
+        telemetry.addData("target",TargetVelocity);
 
 
     }
@@ -284,13 +318,11 @@ public class TeleOpRedST extends OpMode {
     private double getLLRotationOffset(){
         LLResult llResult = limelight3A.getLatestResult();
         if (llResult != null & llResult.isValid()) {
-            telemetry.addData("target X offset", llResult.getTx());
-            telemetry.addData("Target y offset", llResult.getTy());
-            telemetry.addData("Target area offset", llResult.getTa());
+
             double y = llResult.getTy();
             double angleRadians = 3.14*((23+y)/180);
             double targetDist = 26.25 / tan(angleRadians);
-            telemetry.addData("distance:",targetDist);
+
             return llResult.getTx();
         }else{
             return -1;

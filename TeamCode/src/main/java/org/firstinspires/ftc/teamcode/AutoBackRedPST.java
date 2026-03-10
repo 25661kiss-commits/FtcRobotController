@@ -9,7 +9,6 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -17,7 +16,7 @@ import org.firstinspires.ftc.teamcode.mechaisms.ShooterAuto;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous
-public class AutoBackBluePST extends OpMode {
+public class AutoBackRedPST extends OpMode {
     private Limelight3A limelight3A;//limelight obj
     private Follower follower;
     private Timer pathtimer;
@@ -48,12 +47,12 @@ public class AutoBackBluePST extends OpMode {
     }
     PathState pathState;
     private final Pose startPose = new Pose(59.5,5.5,Math.toRadians(90));
-    private final Pose shootPose = new Pose(59.5,15,Math.toRadians(111));
-    private  final Pose endPose = new Pose(34,11.49,Math.toRadians(180));
-    private  final Pose ballsPose = new Pose(22.35,11.49,Math.toRadians(180));
-    private final Pose balls2Pose = new Pose(45.88,23.74,Math.toRadians(140));
-    private final Pose picupBalls2Pose = new Pose(34.51,36.07,Math.toRadians(140));
-    private  final Pose balls4Pose = new Pose(22.35,15.49,Math.toRadians(180));
+    private final Pose shootPose = new Pose(59.5,15,Math.toRadians(65));
+    private  final Pose endPose = new Pose(83,10.49,Math.toRadians(0));
+    private  final Pose ballsPose = new Pose(97.65,10.49,Math.toRadians(0));//96
+    private final Pose balls2Pose = new Pose(74.12,23.74,Math.toRadians(40));
+    private final Pose picupBalls2Pose = new Pose(85.49,36.07,Math.toRadians(40));
+    private  final Pose balls4Pose = new Pose(96.65,15.49,Math.toRadians(0));
 
     private PathChain driveFromStartToShoot, driveShootToEnd, driveEndToBalls, driveBallsToShoot, driveShootToBalls2, drivePickupBalls2, drivePickup2ToShoot, drivePickup4Balls, drive4BallsToShoot;
     public void buildPaths(){
@@ -248,7 +247,7 @@ public class AutoBackBluePST extends OpMode {
         shooter.FrontIntake.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter.FrontIntake.setPower(0);
         shooter.setShooterState(ShooterAuto.ShooterState.IDLE);
-        shooter.targetSpeed = 860;
+        shooter.targetSpeed = 840;
         telemetry.addData("shooterSpeedLeft",shooter.leftShooter.getVelocity());
         telemetry.addData("shooterSpeedRight",shooter.rightShooter.getVelocity());
     }

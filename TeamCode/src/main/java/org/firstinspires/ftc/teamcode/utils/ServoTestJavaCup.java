@@ -1,20 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.utils;
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.mechaisms.MecanumDriveTele;
-
 @TeleOp
+@Disabled
 public class ServoTestJavaCup extends OpMode {
 
 
@@ -35,7 +27,7 @@ public class ServoTestJavaCup extends OpMode {
         ballStopRight = hardwareMap.get(Servo.class,"ball_stop_right");
 
 
-        ballStopLeft.setDirection(Servo.Direction.REVERSE);
+        ballStopLeft.setDirection(Servo.Direction.FORWARD);
         ballStopRight.setDirection(Servo.Direction.FORWARD);
 
     }

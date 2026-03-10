@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
-@Disabled
 public class ShooterCalib extends OpMode {
     private DcMotorEx shooterMotor;
     private DcMotorEx shooterMotor2;
@@ -33,7 +32,8 @@ public class ShooterCalib extends OpMode {
         rtFire = hardwareMap.get(CRServo.class,"right_fire_servo");
         ltFire = hardwareMap.get(CRServo.class,"left_fire_servo");
         limelight3A = hardwareMap.get(Limelight3A.class,"limelight");
-        limelight3A.pipelineSwitch(5);//1 is green
+        limelight3A.pipelineSwitch(3);//1 is green
+        ltIntake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     @Override
     public void start() {
@@ -57,16 +57,12 @@ public class ShooterCalib extends OpMode {
                 throw new RuntimeException(e);
             }
         }
-        if(gamepad1.left_bumper){
-            rtFire.setPower(-1);
+        if(gamepad1.left_bumper||gamepad1.right_bumper){
+            ltIntake.setPower(0.75);
         }else{
-            rtFire.setPower(0);
+            ltIntake.setPower(0);
         }
-        if(gamepad1.right_bumper){
-            ltFire.setPower(1);
-        }else{
-            ltFire.setPower(0);
-        }
+
         ltIntake.setPower(-gamepad1.left_stick_y);
         rtIntake.setPower(-gamepad1.right_stick_y);
         if(shooterMotor.getVelocity() < shooterVelocity){
@@ -92,8 +88,8 @@ public class ShooterCalib extends OpMode {
             telemetry.addData("Target y offset", llResult.getTy());
             telemetry.addData("Target area offset", llResult.getTa());
             double y = llResult.getTy();
-            double angleRadians = 3.14*((18+y)/180);
-            double targetDist = 22.5 / tan(angleRadians);
+            double angleRadians = 3.14*((19.97+y)/180);
+            double targetDist = 18.25 / tan(angleRadians);
             telemetry.addData("distance:",targetDist);
             return targetDist;
         }else{
